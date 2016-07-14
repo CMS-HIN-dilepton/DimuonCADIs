@@ -3,6 +3,7 @@
 #include "buildCharmoniaCtauModel.C"
 #include "buildCharmoniaCtauTrueModel.C"
 #include "drawMassPlot.C"
+#include "drawCtauMassPlot.C"
 #include "drawCtauPlot.C"
 #include "drawCtauErrorPlot.C"
 #include "drawCtauTruePlot.C"
@@ -633,8 +634,13 @@ bool fitCharmonia( RooWorkspace&  inputWorkspace, // Workspace with all the inpu
             }
           }
            
+	//==============================================================================
+         int nBins = min(int( round((cut.dMuon.M.Max - cut.dMuon.M.Min)/binWidth) ), 1000);
+         drawCtauMassPlot(myws, outputDir, opt, cut, (wantPureSMC ? (plotLabel+"_NoBkg") : plotLabel), DSTAG, false, incJpsi, incPsi2S, incBkg, cutCtau, wantPureSMC, setLogScale, incSS, zoomPsi, nBins, getMeanPT); 
+	//==================================================================================
+
 	  cout << "====================ok5========================================" << endl;
-	  int nBins = min(int( round((cut.dMuon.ctau.Max - cut.dMuon.ctau.Min)/binWidth) ), 1000);
+	  nBins = min(int( round((cut.dMuon.ctau.Max - cut.dMuon.ctau.Min)/binWidth) ), 1000);
           drawCtauPlot(myws, outputDir, opt, cut, (wantPureSMC ? (plotLabel+"_NoBkg") : plotLabel), DSTAG, false, fitMass, incJpsi, incPsi2S, incBkg, incPrompt, incNonPrompt, cutCtau, wantPureSMC, setLogScale, incSS, nBins);
 	cout << "====================ok6========================================" << endl;
 	  double width = (myws.var("ctauErr")->getMax() - myws.var("ctauErr")->getMin()) / 100.0;
