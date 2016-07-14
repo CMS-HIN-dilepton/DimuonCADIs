@@ -9,12 +9,11 @@
 #include "TFile.h"
 #include "TTree.h"
 #include "TH1F.h"
-#include "TH2F.h"
-#include "TH2D.h"
 #include "TH1.h"
 #include "TF1.h"
 #include "TProfile.h"
 #include "TVectorD.h"
+#include "TMatrixD.h"
 #include "TCanvas.h"
 #include "TPaveText.h"
 #include "TPave.h"
@@ -23,7 +22,11 @@
 #include "TAxis.h"
 #include "TLegend.h"
 
+#include "RooNumIntConfig.h"
 #include "RooWorkspace.h"
+#include "RooKeysPdf.h"
+#include "RooHistPdf.h"
+#include "RooGaussModel.h"
 #include "RooChi2Var.h"
 #include "RooDataSet.h"
 #include "RooDataHist.h"
@@ -75,7 +78,7 @@ typedef struct EvtPar {
 } EvtPar;
 
 typedef struct DiMuonPar {
-  MinMax ctau, ctauErr, M, Pt, AbsRap;
+  MinMax ctau, ctauErr, ctauTrue, M, Pt, AbsRap;
   string ctauCut;
 } DiMuonPar;
 
@@ -102,7 +105,6 @@ bool isEqualKinCuts(struct KinCuts cutA, struct KinCuts cutB, bool isPbPb)
     cond = cond && (cutA.Centrality.Start    == cutB.Centrality.Start);
     cond = cond && (cutA.Centrality.End      == cutB.Centrality.End);
   }
-
   cond = cond && (cutA.sMuon.Pt.Min        == cutB.sMuon.Pt.Min);
   cond = cond && (cutA.sMuon.Pt.Max        == cutB.sMuon.Pt.Max);
   cond = cond && (cutA.sMuon.Eta.Min       == cutB.sMuon.Eta.Min);
@@ -112,6 +114,9 @@ bool isEqualKinCuts(struct KinCuts cutA, struct KinCuts cutB, bool isPbPb)
   cond = cond && (cutA.dMuon.ctau.Max      == cutB.dMuon.ctau.Max);
   cond = cond && (cutA.dMuon.ctauErr.Min   == cutB.dMuon.ctauErr.Min);
   cond = cond && (cutA.dMuon.ctauErr.Max   == cutB.dMuon.ctauErr.Max);
+  cond = cond && (cutA.dMuon.ctauTrue.Min  == cutB.dMuon.ctauTrue.Min);
+  cond = cond && (cutA.dMuon.ctauTrue.Max  == cutB.dMuon.ctauTrue.Max);
+  cond = cond && (cutA.dMuon.ctauCut       == cutB.dMuon.ctauCut);
   cond = cond && (cutA.dMuon.M.Min         == cutB.dMuon.M.Min);
   cond = cond && (cutA.dMuon.M.Max         == cutB.dMuon.M.Max);
   cond = cond && (cutA.dMuon.Pt.Min        == cutB.dMuon.Pt.Min);
@@ -175,10 +180,22 @@ map< string , MassModel > MassModelDictionary = {
 
 
 enum class CtauModel 
-  {     
-    DoubleGaussianResolution, SingleGaussianResolution,
-    TripleDecay, SingleSidedDecay, Delta
-  };
+{     
+    InvalidModel=0,
+    DoubleGaussianResolution=1, 
+    SingleGaussianResolution=2,
+    TripleDecay=3,
+    SingleSidedDecay=4, 
+    Delta=5
+};
+map< string , CtauModel > CtauModelDictionary = {
+  {"InvalidModel",             CtauModel::InvalidModel},
+  {"DoubleGaussianResolution", CtauModel::DoubleGaussianResolution},
+  {"SingleGaussianResolution", CtauModel::SingleGaussianResolution},
+  {"TripleDecay",              CtauModel::TripleDecay},
+  {"SingleSidedDecay",         CtauModel::SingleSidedDecay},
+  {"Delta",                    CtauModel::Delta}
+};
 
 typedef struct CtauPNP {
   CtauModel    Prompt, NonPrompt;
@@ -192,13 +209,12 @@ typedef struct CtauMassModel {
 typedef struct CharmModel {
   CtauMassModel  Jpsi, Psi2S, Bkg;
   CtauModel CtauRes;
+  CtauModel CtauTrue, CtauTrueRes;
 } CharmModel;
 
 typedef struct OniaModel {
   CharmModel  PbPb, PP;
 } OniaModel;
-
-
 
 
 #endif // #ifndef initClasses_h

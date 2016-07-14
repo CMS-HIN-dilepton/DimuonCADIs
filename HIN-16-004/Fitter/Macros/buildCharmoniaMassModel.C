@@ -1,11 +1,10 @@
 #include "Utilities/initClasses.h"
 
-void fixPsi2StoJpsi(map<string, string>& parIni, bool isPbPb);
+void fixMassParPsi2StoJpsi(map<string, string>& parIni, bool isPbPb);
 void fixPbPbtoPP(map<string, string>& parIni);
-void setDefaultParameters(map<string, string> &parIni, bool isPbPb, double numEntries);
+void setMassDefaultParameters(map<string, string> &parIni, bool isPbPb, double numEntries);
 bool addSignalMassModel(RooWorkspace& ws, string object, MassModel model, map<string,string> parIni, bool isPbPb); 
 bool addBackgroundMassModel(RooWorkspace& ws, string object, MassModel model, map<string,string> parIni, bool isPbPb);
-void setFixedVarsToContantVars(RooWorkspace& ws);
 
 
 bool buildCharmoniaMassModel(RooWorkspace& ws, struct CharmModel model, map<string, string>  parIni, 
@@ -17,13 +16,12 @@ bool buildCharmoniaMassModel(RooWorkspace& ws, struct CharmModel model, map<stri
                              double  numEntries = 300000. // Number of entries in the dataset
                              )
 {
-
   // If the initial parameters are empty, set defaul parameter values
-  setDefaultParameters(parIni, isPbPb, numEntries);
+  setMassDefaultParameters(parIni, isPbPb, numEntries);
 
   // Fix all psi2S parameters to jpsi
   if (incJpsi && incPsi2S) {
-    fixPsi2StoJpsi(parIni, isPbPb);
+    fixMassParPsi2StoJpsi(parIni, isPbPb);
   }
 
   // Let's define the single and double ratio variables
@@ -31,7 +29,7 @@ bool buildCharmoniaMassModel(RooWorkspace& ws, struct CharmModel model, map<stri
     if (doSimulFit && isPbPb) {
 
       // Fix mean, alpha and n parameters in PbPb to PP values 
-      // fixPbPbtoPP(parIni);
+      fixPbPbtoPP(parIni);
 
       // create parameters related to the double ratio
       ws.factory( parIni["RFrac2Svs1S_PbPbvsPP"].c_str() );                     // Double Ratio
@@ -138,8 +136,6 @@ bool buildCharmoniaMassModel(RooWorkspace& ws, struct CharmModel model, map<stri
   }
   ws.import(*themodel);
   ws.pdf(pdfName.c_str())->setNormRange("MassWindow");
-
-  setFixedVarsToContantVars(ws);
 
   // save the initial values of the model we've just created
   RooRealVar *x = ws.var("invMass");
@@ -839,19 +835,19 @@ bool addSignalMassModel(RooWorkspace& ws, string object, MassModel model, map<st
 
 void fixPbPbtoPP(map<string, string>& parIni)
 {
-  //parIni["m_Jpsi_PbPb"]  = Form("RooFormulaVar::%s('@0',{%s})", "m_Jpsi_PbPb", "m_Jpsi_PP");
+  parIni["m_Jpsi_PbPb"]  = Form("RooFormulaVar::%s('@0',{%s})", "m_Jpsi_PbPb", "m_Jpsi_PP");
   //parIni["sigma1_Jpsi_PbPb"]  = Form("RooFormulaVar::%s('@0',{%s})", "sigma1_Jpsi_PbPb", "sigma1_JpsiPP");
   //parIni["sigma1_Psi2S_PbPb"] = Form("RooFormulaVar::%s('@0',{%s})", "sigma1_Psi2S_PbPb", "sigma1_Psi2SPP");
-  // if (parIni.count("rSigma21_Jpsi_PbPb")!=0 && parIni.count("rSigma21_Jpsi_PP")!=0) {
-  //   parIni["sigma2_Jpsi_PbPb"] = Form("RooFormulaVar::%s('@0*@1',{%s,%s})", "sigma2_Jpsi_PbPb", "sigma1_Jpsi_PbPb", "rSigma21_Jpsi_PP");
-  // }
-  // parIni["alpha_Jpsi_PbPb"]  = Form("RooFormulaVar::%s('@0',{%s})", "alpha_Jpsi_PbPb", "alpha_Jpsi_PP");
-  // parIni["n_Jpsi_PbPb"] = Form("RooFormulaVar::%s('@0',{%s})", "n_Jpsi_PbPb", "n_Jpsi_PP");
+  if (parIni.count("rSigma21_Jpsi_PbPb")!=0 && parIni.count("rSigma21_Jpsi_PP")!=0) {
+    parIni["sigma2_Jpsi_PbPb"] = Form("RooFormulaVar::%s('@0*@1',{%s,%s})", "sigma2_Jpsi_PbPb", "sigma1_Jpsi_PbPb", "rSigma21_Jpsi_PP");
+  }
+  parIni["alpha_Jpsi_PbPb"]  = Form("RooFormulaVar::%s('@0',{%s})", "alpha_Jpsi_PbPb", "alpha_Jpsi_PP");
+  parIni["n_Jpsi_PbPb"] = Form("RooFormulaVar::%s('@0',{%s})", "n_Jpsi_PbPb", "n_Jpsi_PP");
   //parIni["f_Jpsi_PbPb"] = Form("RooFormulaVar::%s('@0',{%s})", "f_Jpsi_PbPb", "f_Jpsi_PP");
   //parIni["f_Psi2S_PbPb"] = Form("RooFormulaVar::%s('@0',{%s})", "f_Psi2S_PbPb", "f_Jpsi_PP");  
 };
 
-void fixPsi2StoJpsi(map<string, string>& parIni, bool isPbPb)
+void fixMassParPsi2StoJpsi(map<string, string>& parIni, bool isPbPb)
 {
   cout << "[INFO] Constraining Psi(2S) parameters to Jpsi using PDF Mass Ratio" << endl;
   Double_t MassRatio = (Mass.Psi2S/Mass.JPsi);
@@ -865,11 +861,11 @@ void fixPsi2StoJpsi(map<string, string>& parIni, bool isPbPb)
   parIni[Form("f_Psi2S_%s", (isPbPb?"PbPb":"PP"))]      = Form("RooFormulaVar::%s('@0',{%s})", Form("f_Psi2S_%s", (isPbPb?"PbPb":"PP")), Form("f_Jpsi_%s", (isPbPb?"PbPb":"PP")));
 };
 
-void setDefaultParameters(map<string, string> &parIni, bool isPbPb, double numEntries)
+void setMassDefaultParameters(map<string, string> &parIni, bool isPbPb, double numEntries)
 {
 
   cout << "[INFO] Setting user undefined initial parameters to their default values" << endl;
-
+  
   // DEFAULT SINGLE AND DOUBLE RATIO PARAMETERS
   if (parIni.count("RFrac2Svs1S_PbPbvsPP")==0 || parIni["RFrac2Svs1S_PbPbvsPP"]=="") { 
     parIni["RFrac2Svs1S_PbPbvsPP"] = Form("%s[%.4f,%.4f,%.4f]", "RFrac2Svs1S_PbPbvsPP", 0.26, -3.0, 3.0);
@@ -1020,12 +1016,3 @@ void setDefaultParameters(map<string, string> &parIni, bool isPbPb, double numEn
   }
  
 };
-
-void setFixedVarsToContantVars(RooWorkspace& ws)
-{
-  RooArgSet listVar = ws.allVars();
-  TIterator* parIt = listVar.createIterator();
-  for (RooRealVar* it = (RooRealVar*)parIt->Next(); it!=NULL; it = (RooRealVar*)parIt->Next() ) {
-    if ( it->getMin()==it->getMax() ) it->setConstant(kTRUE);
-  }
-}

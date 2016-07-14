@@ -3,8 +3,6 @@
 
 #include <utility>
 #include <tuple>
-#include <iostream>
-#include <set>
 
 using namespace std;
 
@@ -32,35 +30,6 @@ class anabin : public tuple<binF,binF,binI> {
       void setrapbin(binF rapbin) {get<0>(*this) = rapbin;};
       void setptbin(binF ptbin) {get<1>(*this) = ptbin;};
       void setcentbin(binI centbin) {get<2>(*this) = centbin;};
-      void print() const {
-         cout << "rap=[" << get<0>(*this).low() << "," << get<0>(*this).high() <<
-            "], pt=[" << get<1>(*this).low() << "," << get<1>(*this).high() <<
-            "], cent=[" << get<2>(*this).low() << "," << get<2>(*this).high() << "]" << endl;
-      }
-};
-
-set<anabin> allbins() {
-   set<anabin> ans;
-   ans.insert(anabin(0,1.6,6.5,30,0,200));
-   ans.insert(anabin(0,1.6,6.5,30,0,20));
-   ans.insert(anabin(0,1.6,6.5,30,20,40));
-   ans.insert(anabin(0,1.6,6.5,30,40,60));
-   ans.insert(anabin(0,1.6,6.5,30,60,80));
-   ans.insert(anabin(0,1.6,6.5,30,80,100));
-   ans.insert(anabin(0,1.6,6.5,30,100,200));
-   ans.insert(anabin(0,1.6,6.5,9,0,200));
-   ans.insert(anabin(0,1.6,9,12,0,200));
-   ans.insert(anabin(0,1.6,12,15,0,200));
-   ans.insert(anabin(0,1.6,15,20,0,200));
-   ans.insert(anabin(0,1.6,20,30,0,200));
-   ans.insert(anabin(1.6,2.4,3,30,0,200));
-   ans.insert(anabin(1.6,2.4,3,30,0,40));
-   ans.insert(anabin(1.6,2.4,3,30,40,80));
-   ans.insert(anabin(1.6,2.4,3,30,80,200));
-   ans.insert(anabin(1.6,2.4,3,6.5,0,200));
-   ans.insert(anabin(1.6,2.4,6.5,12,0,200));
-   ans.insert(anabin(1.6,2.4,12,30,0,200));
-   return ans;
 };
 
 #endif // #ifndef bin_h

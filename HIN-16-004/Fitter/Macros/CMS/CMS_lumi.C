@@ -115,26 +115,21 @@ CMS_lumi( TPad* pad, int iPeriod, int iPosX, TString label )
     }
   else if (iPeriod==106)
     {
-      // lumiText += lumi_PbPb2015;
-      // lumiText += ", ";
-      // lumiText += lumi_pp2015;
-      // lumiText2 += " #sqrt{s_{NN}} = 5.02 TeV";
-      lumiText2 += lumi_PbPb2015 + ", ";
-      lumiText2 += lumi_pp2015 + " (5.02 TeV)";
+      lumiText += lumi_PbPb2015;
+      lumiText += ", ";
+      lumiText += lumi_pp2015;
+      lumiText2 += " #sqrt{s_{NN}} = 5.02 TeV";
     }
-  else if (iPeriod==107)
-    {
-      // lumiText += lumi_pp2015;
-      // lumiText2 += " #sqrt{s} = 5.02 TeV";
-      lumiText2 += lumi_pp2015 + " (5.02 TeV)";
-    }
-  else if (iPeriod==108)
-    {
-      // lumiText += lumi_PbPb2015;
-      // lumiText2 += " #sqrt{s_{NN}} = 5.02 TeV";
-      lumiText2 += lumi_PbPb2015 + " (5.02 TeV)";
-    }
-   
+   else if (iPeriod==107)
+     {
+       lumiText += lumi_pp2015;
+       lumiText2 += " #sqrt{s} = 5.02 TeV";
+     }
+   else if (iPeriod==108)
+     {
+       lumiText += lumi_PbPb2015;
+       lumiText2 += " #sqrt{s_{NN}} = 5.02 TeV";
+     }
   cout << lumiText << endl;
 
   TLatex latex;

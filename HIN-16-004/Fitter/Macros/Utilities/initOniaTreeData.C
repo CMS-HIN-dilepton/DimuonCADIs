@@ -22,260 +22,232 @@
 Int_t           fCurrent; //!current Tree number in a TChain
 
 // Declaration of leaf types
-UInt_t          eventNb;
-UInt_t          runNb;
-UInt_t          LS;
-Float_t         zVtx;
-Int_t           Centrality;
-Int_t           nTrig;
-Int_t           trigPrescale[99];   //[nTrig]
-ULong64_t       HLTriggers;
-Int_t           Npix;
-Int_t           NpixelTracks;
-Int_t           Ntracks;
-Float_t         SumET_HF;
-Float_t         SumET_HFplus;
-Float_t         SumET_HFminus;
-Float_t         SumET_HFplusEta4;
-Float_t         SumET_HFminusEta4;
-Float_t         SumET_ET;
-Float_t         SumET_EE;
-Float_t         SumET_EB;
-Float_t         SumET_EEplus;
-Float_t         SumET_EEminus;
-Float_t         SumET_ZDC;
-Float_t         SumET_ZDCplus;
-Float_t         SumET_ZDCminus;
-Int_t           nEP;
-Float_t         rpAng[210];   //[nEP]
-Float_t         rpSin[210];   //[nEP]
-Float_t         rpCos[210];   //[nEP]
-Int_t           Reco_QQ_size;
-Int_t           Reco_QQ_type[210];   //[Reco_QQ_size]
-Int_t           Reco_QQ_sign[210];   //[Reco_QQ_size]
-TClonesArray    *Reco_QQ_4mom;
-TClonesArray    *Reco_QQ_mupl_4mom;
-TClonesArray    *Reco_QQ_mumi_4mom;
-ULong64_t       Reco_QQ_trig[210];   //[Reco_QQ_size]
-ULong64_t       Reco_QQ_mupl_trig[210];   //[Reco_QQ_size]
-ULong64_t       Reco_QQ_mumi_trig[210];   //[Reco_QQ_size]
-Bool_t          Reco_QQ_isCowboy[210];   //[Reco_QQ_size]
-Float_t         Reco_QQ_ctau[210];   //[Reco_QQ_size]
-Float_t         Reco_QQ_ctauErr[210];   //[Reco_QQ_size]
-Float_t         Reco_QQ_ctau3D[210];   //[Reco_QQ_size]
-Float_t         Reco_QQ_ctauErr3D[210];   //[Reco_QQ_size]
-Float_t         Reco_QQ_ctauTrue[210];   //[Reco_QQ_size]
-Float_t         Reco_QQ_ctauTrue3D[210];   //[Reco_QQ_size]
-Float_t         Reco_QQ_VtxProb[210];   //[Reco_QQ_size]
-Float_t         Reco_QQ_dca[210];   //[Reco_QQ_size]
-Float_t         Reco_QQ_MassErr[210];   //[Reco_QQ_size]
-TClonesArray    *Reco_QQ_vtx;
-Int_t           Reco_QQ_Ntrk[210];   //[Reco_QQ_size]
-Bool_t          Reco_QQ_mupl_isGoodMuon[210];   //[Reco_QQ_size]
-Bool_t          Reco_QQ_mumi_isGoodMuon[210];   //[Reco_QQ_size]
-Bool_t          Reco_QQ_mupl_highPurity[210];   //[Reco_QQ_size]
-Bool_t          Reco_QQ_mumi_highPurity[210];   //[Reco_QQ_size]
-Bool_t          Reco_QQ_mupl_TrkMuArb[210];   //[Reco_QQ_size]
-Bool_t          Reco_QQ_mumi_TrkMuArb[210];   //[Reco_QQ_size]
-Bool_t          Reco_QQ_mupl_TMOneStaTight[210];   //[Reco_QQ_size]
-Bool_t          Reco_QQ_mumi_TMOneStaTight[210];   //[Reco_QQ_size]
-Int_t           Reco_QQ_mupl_nPixValHits[210];   //[Reco_QQ_size]
-Int_t           Reco_QQ_mumi_nPixValHits[210];   //[Reco_QQ_size]
-Int_t           Reco_QQ_mupl_nMuValHits[210];   //[Reco_QQ_size]
-Int_t           Reco_QQ_mumi_nMuValHits[210];   //[Reco_QQ_size]
-Int_t           Reco_QQ_mupl_nTrkHits[210];   //[Reco_QQ_size]
-Int_t           Reco_QQ_mumi_nTrkHits[210];   //[Reco_QQ_size]
-Float_t         Reco_QQ_mupl_normChi2_inner[210];   //[Reco_QQ_size]
-Float_t         Reco_QQ_mumi_normChi2_inner[210];   //[Reco_QQ_size]
-Float_t         Reco_QQ_mupl_normChi2_global[210];   //[Reco_QQ_size]
-Float_t         Reco_QQ_mumi_normChi2_global[210];   //[Reco_QQ_size]
-Int_t           Reco_QQ_mupl_nPixWMea[210];   //[Reco_QQ_size]
-Int_t           Reco_QQ_mumi_nPixWMea[210];   //[Reco_QQ_size]
-Int_t           Reco_QQ_mupl_nTrkWMea[210];   //[Reco_QQ_size]
-Int_t           Reco_QQ_mumi_nTrkWMea[210];   //[Reco_QQ_size]
-Int_t           Reco_QQ_mupl_StationsMatched[210];   //[Reco_QQ_size]
-Int_t           Reco_QQ_mumi_StationsMatched[210];   //[Reco_QQ_size]
-Float_t         Reco_QQ_mupl_dxy[210];   //[Reco_QQ_size]
-Float_t         Reco_QQ_mumi_dxy[210];   //[Reco_QQ_size]
-Float_t         Reco_QQ_mupl_dxyErr[210];   //[Reco_QQ_size]
-Float_t         Reco_QQ_mumi_dxyErr[210];   //[Reco_QQ_size]
-Float_t         Reco_QQ_mupl_dz[210];   //[Reco_QQ_size]
-Float_t         Reco_QQ_mumi_dz[210];   //[Reco_QQ_size]
-Float_t         Reco_QQ_mupl_dzErr[210];   //[Reco_QQ_size]
-Float_t         Reco_QQ_mumi_dzErr[210];   //[Reco_QQ_size]
-Float_t         Reco_QQ_mupl_pt_inner[210];   //[Reco_QQ_size]
-Float_t         Reco_QQ_mumi_pt_inner[210];   //[Reco_QQ_size]
-Float_t         Reco_QQ_mupl_pt_global[210];   //[Reco_QQ_size]
-Float_t         Reco_QQ_mumi_pt_global[210];   //[Reco_QQ_size]
-Float_t         Reco_QQ_mupl_ptErr_inner[210];   //[Reco_QQ_size]
-Float_t         Reco_QQ_mumi_ptErr_inner[210];   //[Reco_QQ_size]
-Float_t         Reco_QQ_mupl_ptErr_global[210];   //[Reco_QQ_size]
-Float_t         Reco_QQ_mumi_ptErr_global[210];   //[Reco_QQ_size]
-Int_t           Reco_mu_size;
-Int_t           Reco_mu_type[210];   //[Reco_mu_size]
-Int_t           Reco_mu_charge[210];   //[Reco_mu_size]
-TClonesArray    *Reco_mu_4mom;
-ULong64_t       Reco_mu_trig[210];   //[Reco_mu_size]
-Bool_t          Reco_mu_isGoodMuon[210];   //[Reco_mu_size]
-Bool_t          Reco_mu_highPurity[210];   //[Reco_mu_size]
-Bool_t          Reco_mu_TrkMuArb[210];   //[Reco_mu_size]
-Bool_t          Reco_mu_TMOneStaTight[210];   //[Reco_mu_size]
-Int_t           Reco_mu_nPixValHits[210];   //[Reco_mu_size]
-Int_t           Reco_mu_nMuValHits[210];   //[Reco_mu_size]
-Int_t           Reco_mu_nTrkHits[210];   //[Reco_mu_size]
-Float_t         Reco_mu_normChi2_inner[210];   //[Reco_mu_size]
-Float_t         Reco_mu_normChi2_global[210];   //[Reco_mu_size]
-Int_t           Reco_mu_nPixWMea[210];   //[Reco_mu_size]
-Int_t           Reco_mu_nTrkWMea[210];   //[Reco_mu_size]
-Int_t           Reco_mu_StationsMatched[210];   //[Reco_mu_size]
-Float_t         Reco_mu_dxy[210];   //[Reco_mu_size]
-Float_t         Reco_mu_dxyErr[210];   //[Reco_mu_size]
-Float_t         Reco_mu_dz[210];   //[Reco_mu_size]
-Float_t         Reco_mu_dzErr[210];   //[Reco_mu_size]
-Float_t         Reco_mu_pt_inner[210];   //[Reco_mu_size]
-Float_t         Reco_mu_pt_global[210];   //[Reco_mu_size]
-Float_t         Reco_mu_ptErr_inner[210];   //[Reco_mu_size]
-Float_t         Reco_mu_ptErr_global[210];   //[Reco_mu_size]
-Int_t           Gen_QQ_size;
-Int_t           Gen_QQ_type[99];   //[Gen_QQ_size]
-TClonesArray    *Gen_QQ_4mom;
-Int_t           Gen_QQ_momId[99];   //[Gen_QQ_size]
-Float_t         Gen_QQ_ctau[99];   //[Gen_QQ_size]
-Float_t         Gen_QQ_ctau3D[99];   //[Gen_QQ_size]
-TClonesArray    *Gen_QQ_mupl_4mom;
-TClonesArray    *Gen_QQ_mumi_4mom;
-Int_t           Gen_mu_size;
-Int_t           Gen_mu_type[99];   //[Gen_mu_size]
-Int_t           Gen_mu_charge[99];   //[Gen_mu_size]
-TClonesArray    *Gen_mu_4mom;
+   UInt_t          eventNb;
+   UInt_t          runNb;
+   UInt_t          LS;
+   Float_t         zVtx;
+   Float_t         nPV;
+   Int_t           Centrality;
+   Int_t           nTrig;
+   Int_t           trigPrescale[15];   //[nTrig]
+   ULong64_t       HLTriggers;
+   Int_t           Npix;
+   Int_t           NpixelTracks;
+   Int_t           Ntracks;
+   Float_t         SumET_HF;
+   Float_t         SumET_HFplus;
+   Float_t         SumET_HFminus;
+   Float_t         SumET_HFplusEta4;
+   Float_t         SumET_HFminusEta4;
+   Float_t         SumET_ET;
+   Float_t         SumET_EE;
+   Float_t         SumET_EB;
+   Float_t         SumET_EEplus;
+   Float_t         SumET_EEminus;
+   Float_t         SumET_ZDC;
+   Float_t         SumET_ZDCplus;
+   Float_t         SumET_ZDCminus;
+   Int_t           Reco_QQ_size;
+   Int_t           Reco_QQ_type[210];   //[Reco_QQ_size]
+   Int_t           Reco_QQ_sign[210];   //[Reco_QQ_size]
+   TClonesArray    *Reco_QQ_4mom;
+   TClonesArray    *Reco_QQ_mupl_4mom;
+   TClonesArray    *Reco_QQ_mumi_4mom;
+   ULong64_t       Reco_QQ_trig[210];   //[Reco_QQ_size]
+   ULong64_t       Reco_QQ_mupl_trig[210];   //[Reco_QQ_size]
+   ULong64_t       Reco_QQ_mumi_trig[210];   //[Reco_QQ_size]
+   Bool_t          Reco_QQ_isCowboy[210];   //[Reco_QQ_size]
+   Float_t         Reco_QQ_ctau[210];   //[Reco_QQ_size]
+   Float_t         Reco_QQ_ctauErr[210];   //[Reco_QQ_size]
+   Float_t         Reco_QQ_ctau3D[210];   //[Reco_QQ_size]
+   Float_t         Reco_QQ_ctauErr3D[210];   //[Reco_QQ_size]
+   Float_t         Reco_QQ_VtxProb[210];   //[Reco_QQ_size]
+   Float_t         Reco_QQ_dca[210];   //[Reco_QQ_size]
+   Float_t         Reco_QQ_MassErr[210];   //[Reco_QQ_size]
+   TClonesArray    *Reco_QQ_vtx;
+   Int_t           Reco_QQ_Ntrk[210];   //[Reco_QQ_size]
+   Int_t           Reco_QQ_mupl_SelectionType[210];   //[Reco_QQ_size]
+   Int_t           Reco_QQ_mumi_SelectionType[210];   //[Reco_QQ_size]
+   Bool_t          Reco_QQ_mupl_isGoodMuon[210];   //[Reco_QQ_size]
+   Bool_t          Reco_QQ_mumi_isGoodMuon[210];   //[Reco_QQ_size]
+   Bool_t          Reco_QQ_mupl_highPurity[210];   //[Reco_QQ_size]
+   Bool_t          Reco_QQ_mumi_highPurity[210];   //[Reco_QQ_size]
+   Bool_t          Reco_QQ_mupl_TrkMuArb[210];   //[Reco_QQ_size]
+   Bool_t          Reco_QQ_mumi_TrkMuArb[210];   //[Reco_QQ_size]
+   Bool_t          Reco_QQ_mupl_TMOneStaTight[210];   //[Reco_QQ_size]
+   Bool_t          Reco_QQ_mumi_TMOneStaTight[210];   //[Reco_QQ_size]
+   Int_t           Reco_QQ_mupl_nPixValHits[210];   //[Reco_QQ_size]
+   Int_t           Reco_QQ_mumi_nPixValHits[210];   //[Reco_QQ_size]
+   Int_t           Reco_QQ_mupl_nMuValHits[210];   //[Reco_QQ_size]
+   Int_t           Reco_QQ_mumi_nMuValHits[210];   //[Reco_QQ_size]
+   Int_t           Reco_QQ_mupl_nTrkHits[210];   //[Reco_QQ_size]
+   Int_t           Reco_QQ_mumi_nTrkHits[210];   //[Reco_QQ_size]
+   Float_t         Reco_QQ_mupl_normChi2_inner[210];   //[Reco_QQ_size]
+   Float_t         Reco_QQ_mumi_normChi2_inner[210];   //[Reco_QQ_size]
+   Float_t         Reco_QQ_mupl_normChi2_global[210];   //[Reco_QQ_size]
+   Float_t         Reco_QQ_mumi_normChi2_global[210];   //[Reco_QQ_size]
+   Int_t           Reco_QQ_mupl_nPixWMea[210];   //[Reco_QQ_size]
+   Int_t           Reco_QQ_mumi_nPixWMea[210];   //[Reco_QQ_size]
+   Int_t           Reco_QQ_mupl_nTrkWMea[210];   //[Reco_QQ_size]
+   Int_t           Reco_QQ_mumi_nTrkWMea[210];   //[Reco_QQ_size]
+   Int_t           Reco_QQ_mupl_StationsMatched[210];   //[Reco_QQ_size]
+   Int_t           Reco_QQ_mumi_StationsMatched[210];   //[Reco_QQ_size]
+   Float_t         Reco_QQ_mupl_dxy[210];   //[Reco_QQ_size]
+   Float_t         Reco_QQ_mumi_dxy[210];   //[Reco_QQ_size]
+   Float_t         Reco_QQ_mupl_dxyErr[210];   //[Reco_QQ_size]
+   Float_t         Reco_QQ_mumi_dxyErr[210];   //[Reco_QQ_size]
+   Float_t         Reco_QQ_mupl_dz[210];   //[Reco_QQ_size]
+   Float_t         Reco_QQ_mumi_dz[210];   //[Reco_QQ_size]
+   Float_t         Reco_QQ_mupl_dzErr[210];   //[Reco_QQ_size]
+   Float_t         Reco_QQ_mumi_dzErr[210];   //[Reco_QQ_size]
+   Float_t         Reco_QQ_mupl_pt_inner[210];   //[Reco_QQ_size]
+   Float_t         Reco_QQ_mumi_pt_inner[210];   //[Reco_QQ_size]
+   Float_t         Reco_QQ_mupl_pt_global[210];   //[Reco_QQ_size]
+   Float_t         Reco_QQ_mumi_pt_global[210];   //[Reco_QQ_size]
+   Float_t         Reco_QQ_mupl_ptErr_inner[210];   //[Reco_QQ_size]
+   Float_t         Reco_QQ_mumi_ptErr_inner[210];   //[Reco_QQ_size]
+   Float_t         Reco_QQ_mupl_ptErr_global[210];   //[Reco_QQ_size]
+   Float_t         Reco_QQ_mumi_ptErr_global[210];   //[Reco_QQ_size]
+   Int_t           Reco_mu_size;
+   Int_t           Reco_mu_type[23];   //[Reco_mu_size]
+   Int_t           Reco_mu_SelectionType[23];   //[Reco_mu_size]
+   Int_t           Reco_mu_charge[23];   //[Reco_mu_size]
+   TClonesArray    *Reco_mu_4mom;
+   ULong64_t       Reco_mu_trig[23];   //[Reco_mu_size]
+   Bool_t          Reco_mu_isGoodMuon[23];   //[Reco_mu_size]
+   Bool_t          Reco_mu_highPurity[23];   //[Reco_mu_size]
+   Bool_t          Reco_mu_TrkMuArb[23];   //[Reco_mu_size]
+   Bool_t          Reco_mu_TMOneStaTight[23];   //[Reco_mu_size]
+   Int_t           Reco_mu_nPixValHits[23];   //[Reco_mu_size]
+   Int_t           Reco_mu_nMuValHits[23];   //[Reco_mu_size]
+   Int_t           Reco_mu_nTrkHits[23];   //[Reco_mu_size]
+   Float_t         Reco_mu_normChi2_inner[23];   //[Reco_mu_size]
+   Float_t         Reco_mu_normChi2_global[23];   //[Reco_mu_size]
+   Int_t           Reco_mu_nPixWMea[23];   //[Reco_mu_size]
+   Int_t           Reco_mu_nTrkWMea[23];   //[Reco_mu_size]
+   Int_t           Reco_mu_StationsMatched[23];   //[Reco_mu_size]
+   Float_t         Reco_mu_dxy[23];   //[Reco_mu_size]
+   Float_t         Reco_mu_dxyErr[23];   //[Reco_mu_size]
+   Float_t         Reco_mu_dz[23];   //[Reco_mu_size]
+   Float_t         Reco_mu_dzErr[23];   //[Reco_mu_size]
+   Float_t         Reco_mu_pt_inner[23];   //[Reco_mu_size]
+   Float_t         Reco_mu_pt_global[23];   //[Reco_mu_size]
+   Float_t         Reco_mu_ptErr_inner[23];   //[Reco_mu_size]
+   Float_t         Reco_mu_ptErr_global[23];   //[Reco_mu_size]
 
-// List of branches
-TBranch        *b_eventNb;   //!
-TBranch        *b_runNb;   //!
-TBranch        *b_LS;   //!
-TBranch        *b_zVtx;   //!
-TBranch        *b_Centrality;   //!
-TBranch        *b_nTrig;   //!
-TBranch        *b_trigPrescale;   //!
-TBranch        *b_HLTriggers;   //!
-TBranch        *b_Npix;   //!
-TBranch        *b_NpixelTracks;   //!
-TBranch        *b_Ntracks;   //!
-TBranch        *b_SumET_HF;   //!
-TBranch        *b_SumET_HFplus;   //!
-TBranch        *b_SumET_HFminus;   //!
-TBranch        *b_SumET_HFplusEta4;   //!
-TBranch        *b_SumET_HFminusEta4;   //!
-TBranch        *b_SumET_ET;   //!
-TBranch        *b_SumET_EE;   //!
-TBranch        *b_SumET_EB;   //!
-TBranch        *b_SumET_EEplus;   //!
-TBranch        *b_SumET_EEminus;   //!
-TBranch        *b_SumET_ZDC;   //!
-TBranch        *b_SumET_ZDCplus;   //!
-TBranch        *b_SumET_ZDCminus;   //!
-TBranch        *b_nEP;   //!
-TBranch        *b_rpAng;   //!
-TBranch        *b_rpSin;   //!
-TBranch        *b_rpCos;   //!
-TBranch        *b_Reco_QQ_size;   //!
-TBranch        *b_Reco_QQ_type;   //!
-TBranch        *b_Reco_QQ_sign;   //!
-TBranch        *b_Reco_QQ_4mom;   //!
-TBranch        *b_Reco_QQ_mupl_4mom;   //!
-TBranch        *b_Reco_QQ_mumi_4mom;   //!
-TBranch        *b_Reco_QQ_trig;   //!
-TBranch        *b_Reco_QQ_mupl_trig;   //!
-TBranch        *b_Reco_QQ_mumi_trig;   //!
-TBranch        *b_Reco_QQ_isCowboy;   //!
-TBranch        *b_Reco_QQ_ctau;   //!
-TBranch        *b_Reco_QQ_ctauErr;   //!
-TBranch        *b_Reco_QQ_ctau3D;   //!
-TBranch        *b_Reco_QQ_ctauErr3D;   //!
-TBranch        *b_Reco_QQ_ctauTrue;   //!
-TBranch        *b_Reco_QQ_ctauTrue3D;   //!
-TBranch        *b_Reco_QQ_VtxProb;   //!
-TBranch        *b_Reco_QQ_dca;   //!
-TBranch        *b_Reco_QQ_MassErr;   //!
-TBranch        *b_Reco_QQ_vtx;   //!
-TBranch        *b_Reco_QQ_Ntrk;   //!
-TBranch        *b_Reco_QQ_mupl_isGoodMuon;   //!
-TBranch        *b_Reco_QQ_mumi_isGoodMuon;   //!
-TBranch        *b_Reco_QQ_mupl_highPurity;   //!
-TBranch        *b_Reco_QQ_mumi_highPurity;   //!
-TBranch        *b_Reco_QQ_mupl_TrkMuArb;   //!
-TBranch        *b_Reco_QQ_mumi_TrkMuArb;   //!
-TBranch        *b_Reco_QQ_mupl_TMOneStaTight;   //!
-TBranch        *b_Reco_QQ_mumi_TMOneStaTight;   //!
-TBranch        *b_Reco_QQ_mupl_nPixValHits;   //!
-TBranch        *b_Reco_QQ_mumi_nPixValHits;   //!
-TBranch        *b_Reco_QQ_mupl_nMuValHits;   //!
-TBranch        *b_Reco_QQ_mumi_nMuValHits;   //!
-TBranch        *b_Reco_QQ_mupl_nTrkHits;   //!
-TBranch        *b_Reco_QQ_mumi_nTrkHits;   //!
-TBranch        *b_Reco_QQ_mupl_normChi2_inner;   //!
-TBranch        *b_Reco_QQ_mumi_normChi2_inner;   //!
-TBranch        *b_Reco_QQ_mupl_normChi2_global;   //!
-TBranch        *b_Reco_QQ_mumi_normChi2_global;   //!
-TBranch        *b_Reco_QQ_mupl_nPixWMea;   //!
-TBranch        *b_Reco_QQ_mumi_nPixWMea;   //!
-TBranch        *b_Reco_QQ_mupl_nTrkWMea;   //!
-TBranch        *b_Reco_QQ_mumi_nTrkWMea;   //!
-TBranch        *b_Reco_QQ_mupl_StationsMatched;   //!
-TBranch        *b_Reco_QQ_mumi_StationsMatched;   //!
-TBranch        *b_Reco_QQ_mupl_dxy;   //!
-TBranch        *b_Reco_QQ_mumi_dxy;   //!
-TBranch        *b_Reco_QQ_mupl_dxyErr;   //!
-TBranch        *b_Reco_QQ_mumi_dxyErr;   //!
-TBranch        *b_Reco_QQ_mupl_dz;   //!
-TBranch        *b_Reco_QQ_mumi_dz;   //!
-TBranch        *b_Reco_QQ_mupl_dzErr;   //!
-TBranch        *b_Reco_QQ_mumi_dzErr;   //!
-TBranch        *b_Reco_QQ_mupl_pt_inner;   //!
-TBranch        *b_Reco_QQ_mumi_pt_inner;   //!
-TBranch        *b_Reco_QQ_mupl_pt_global;   //!
-TBranch        *b_Reco_QQ_mumi_pt_global;   //!
-TBranch        *b_Reco_QQ_mupl_ptErr_inner;   //!
-TBranch        *b_Reco_QQ_mumi_ptErr_inner;   //!
-TBranch        *b_Reco_QQ_mupl_ptErr_global;   //!
-TBranch        *b_Reco_QQ_mumi_ptErr_global;   //!
-TBranch        *b_Reco_mu_size;   //!
-TBranch        *b_Reco_mu_type;   //!
-TBranch        *b_Reco_mu_charge;   //!
-TBranch        *b_Reco_mu_4mom;   //!
-TBranch        *b_Reco_mu_trig;   //!
-TBranch        *b_Reco_mu_isGoodMuon;   //!
-TBranch        *b_Reco_mu_highPurity;   //!
-TBranch        *b_Reco_mu_TrkMuArb;   //!
-TBranch        *b_Reco_mu_TMOneStaTight;   //!
-TBranch        *b_Reco_mu_nPixValHits;   //!
-TBranch        *b_Reco_mu_nMuValHits;   //!
-TBranch        *b_Reco_mu_nTrkHits;   //!
-TBranch        *b_Reco_mu_normChi2_inner;   //!
-TBranch        *b_Reco_mu_normChi2_global;   //!
-TBranch        *b_Reco_mu_nPixWMea;   //!
-TBranch        *b_Reco_mu_nTrkWMea;   //!
-TBranch        *b_Reco_mu_StationsMatched;   //!
-TBranch        *b_Reco_mu_dxy;   //!
-TBranch        *b_Reco_mu_dxyErr;   //!
-TBranch        *b_Reco_mu_dz;   //!
-TBranch        *b_Reco_mu_dzErr;   //!
-TBranch        *b_Reco_mu_pt_inner;   //!
-TBranch        *b_Reco_mu_pt_global;   //!
-TBranch        *b_Reco_mu_ptErr_inner;   //!
-TBranch        *b_Reco_mu_ptErr_global;   //!
-TBranch        *b_Gen_QQ_size;   //!
-TBranch        *b_Gen_QQ_type;   //!
-TBranch        *b_Gen_QQ_4mom;   //!
-TBranch        *b_Gen_QQ_momId;   //!
-TBranch        *b_Gen_QQ_ctau;   //!
-TBranch        *b_Gen_QQ_ctau3D;   //!
-TBranch        *b_Gen_QQ_mupl_4mom;   //!
-TBranch        *b_Gen_QQ_mumi_4mom;   //!
-TBranch        *b_Gen_mu_size;   //!
-TBranch        *b_Gen_mu_type;   //!
-TBranch        *b_Gen_mu_charge;   //!
-TBranch        *b_Gen_mu_4mom;   //!
+   // List of branches
+   TBranch        *b_eventNb;   //!
+   TBranch        *b_runNb;   //!
+   TBranch        *b_LS;   //!
+   TBranch        *b_zVtx;   //!
+   TBranch        *b_nPV;   //!
+   TBranch        *b_Centrality;   //!
+   TBranch        *b_nTrig;   //!
+   TBranch        *b_trigPrescale;   //!
+   TBranch        *b_HLTriggers;   //!
+   TBranch        *b_Npix;   //!
+   TBranch        *b_NpixelTracks;   //!
+   TBranch        *b_Ntracks;   //!
+   TBranch        *b_SumET_HF;   //!
+   TBranch        *b_SumET_HFplus;   //!
+   TBranch        *b_SumET_HFminus;   //!
+   TBranch        *b_SumET_HFplusEta4;   //!
+   TBranch        *b_SumET_HFminusEta4;   //!
+   TBranch        *b_SumET_ET;   //!
+   TBranch        *b_SumET_EE;   //!
+   TBranch        *b_SumET_EB;   //!
+   TBranch        *b_SumET_EEplus;   //!
+   TBranch        *b_SumET_EEminus;   //!
+   TBranch        *b_SumET_ZDC;   //!
+   TBranch        *b_SumET_ZDCplus;   //!
+   TBranch        *b_SumET_ZDCminus;   //!
+   TBranch        *b_Reco_QQ_size;   //!
+   TBranch        *b_Reco_QQ_type;   //!
+   TBranch        *b_Reco_QQ_sign;   //!
+   TBranch        *b_Reco_QQ_4mom;   //!
+   TBranch        *b_Reco_QQ_mupl_4mom;   //!
+   TBranch        *b_Reco_QQ_mumi_4mom;   //!
+   TBranch        *b_Reco_QQ_trig;   //!
+   TBranch        *b_Reco_QQ_mupl_trig;   //!
+   TBranch        *b_Reco_QQ_mumi_trig;   //!
+   TBranch        *b_Reco_QQ_isCowboy;   //!
+   TBranch        *b_Reco_QQ_ctau;   //!
+   TBranch        *b_Reco_QQ_ctauErr;   //!
+   TBranch        *b_Reco_QQ_ctau3D;   //!
+   TBranch        *b_Reco_QQ_ctauErr3D;   //!
+   TBranch        *b_Reco_QQ_VtxProb;   //!
+   TBranch        *b_Reco_QQ_dca;   //!
+   TBranch        *b_Reco_QQ_MassErr;   //!
+   TBranch        *b_Reco_QQ_vtx;   //!
+   TBranch        *b_Reco_QQ_Ntrk;   //!
+   TBranch        *b_Reco_QQ_mupl_SelectionType;   //!
+   TBranch        *b_Reco_QQ_mumi_SelectionType;   //!
+   TBranch        *b_Reco_QQ_mupl_isGoodMuon;   //!
+   TBranch        *b_Reco_QQ_mumi_isGoodMuon;   //!
+   TBranch        *b_Reco_QQ_mupl_highPurity;   //!
+   TBranch        *b_Reco_QQ_mumi_highPurity;   //!
+   TBranch        *b_Reco_QQ_mupl_TrkMuArb;   //!
+   TBranch        *b_Reco_QQ_mumi_TrkMuArb;   //!
+   TBranch        *b_Reco_QQ_mupl_TMOneStaTight;   //!
+   TBranch        *b_Reco_QQ_mumi_TMOneStaTight;   //!
+   TBranch        *b_Reco_QQ_mupl_nPixValHits;   //!
+   TBranch        *b_Reco_QQ_mumi_nPixValHits;   //!
+   TBranch        *b_Reco_QQ_mupl_nMuValHits;   //!
+   TBranch        *b_Reco_QQ_mumi_nMuValHits;   //!
+   TBranch        *b_Reco_QQ_mupl_nTrkHits;   //!
+   TBranch        *b_Reco_QQ_mumi_nTrkHits;   //!
+   TBranch        *b_Reco_QQ_mupl_normChi2_inner;   //!
+   TBranch        *b_Reco_QQ_mumi_normChi2_inner;   //!
+   TBranch        *b_Reco_QQ_mupl_normChi2_global;   //!
+   TBranch        *b_Reco_QQ_mumi_normChi2_global;   //!
+   TBranch        *b_Reco_QQ_mupl_nPixWMea;   //!
+   TBranch        *b_Reco_QQ_mumi_nPixWMea;   //!
+   TBranch        *b_Reco_QQ_mupl_nTrkWMea;   //!
+   TBranch        *b_Reco_QQ_mumi_nTrkWMea;   //!
+   TBranch        *b_Reco_QQ_mupl_StationsMatched;   //!
+   TBranch        *b_Reco_QQ_mumi_StationsMatched;   //!
+   TBranch        *b_Reco_QQ_mupl_dxy;   //!
+   TBranch        *b_Reco_QQ_mumi_dxy;   //!
+   TBranch        *b_Reco_QQ_mupl_dxyErr;   //!
+   TBranch        *b_Reco_QQ_mumi_dxyErr;   //!
+   TBranch        *b_Reco_QQ_mupl_dz;   //!
+   TBranch        *b_Reco_QQ_mumi_dz;   //!
+   TBranch        *b_Reco_QQ_mupl_dzErr;   //!
+   TBranch        *b_Reco_QQ_mumi_dzErr;   //!
+   TBranch        *b_Reco_QQ_mupl_pt_inner;   //!
+   TBranch        *b_Reco_QQ_mumi_pt_inner;   //!
+   TBranch        *b_Reco_QQ_mupl_pt_global;   //!
+   TBranch        *b_Reco_QQ_mumi_pt_global;   //!
+   TBranch        *b_Reco_QQ_mupl_ptErr_inner;   //!
+   TBranch        *b_Reco_QQ_mumi_ptErr_inner;   //!
+   TBranch        *b_Reco_QQ_mupl_ptErr_global;   //!
+   TBranch        *b_Reco_QQ_mumi_ptErr_global;   //!
+   TBranch        *b_Reco_mu_size;   //!
+   TBranch        *b_Reco_mu_type;   //!
+   TBranch        *b_Reco_mu_SelectionType;   //!
+   TBranch        *b_Reco_mu_charge;   //!
+   TBranch        *b_Reco_mu_4mom;   //!
+   TBranch        *b_Reco_mu_trig;   //!
+   TBranch        *b_Reco_mu_isGoodMuon;   //!
+   TBranch        *b_Reco_mu_highPurity;   //!
+   TBranch        *b_Reco_mu_TrkMuArb;   //!
+   TBranch        *b_Reco_mu_TMOneStaTight;   //!
+   TBranch        *b_Reco_mu_nPixValHits;   //!
+   TBranch        *b_Reco_mu_nMuValHits;   //!
+   TBranch        *b_Reco_mu_nTrkHits;   //!
+   TBranch        *b_Reco_mu_normChi2_inner;   //!
+   TBranch        *b_Reco_mu_normChi2_global;   //!
+   TBranch        *b_Reco_mu_nPixWMea;   //!
+   TBranch        *b_Reco_mu_nTrkWMea;   //!
+   TBranch        *b_Reco_mu_StationsMatched;   //!
+   TBranch        *b_Reco_mu_dxy;   //!
+   TBranch        *b_Reco_mu_dxyErr;   //!
+   TBranch        *b_Reco_mu_dz;   //!
+   TBranch        *b_Reco_mu_dzErr;   //!
+   TBranch        *b_Reco_mu_pt_inner;   //!
+   TBranch        *b_Reco_mu_pt_global;   //!
+   TBranch        *b_Reco_mu_ptErr_inner;   //!
+   TBranch        *b_Reco_mu_ptErr_global;   //!
 
 string TreeName("hionia/myTree");
 
@@ -298,10 +270,10 @@ void initOniaTree(TChain *tree)
    Reco_QQ_mumi_4mom = 0;
    Reco_QQ_vtx = 0;
    Reco_mu_4mom = 0;
-   Gen_QQ_4mom = 0;
-   Gen_QQ_mupl_4mom = 0;
-   Gen_QQ_mumi_4mom = 0;
-   Gen_mu_4mom = 0;
+   //Gen_QQ_4mom = 0;
+   //Gen_QQ_mupl_4mom = 0;
+   //Gen_QQ_mumi_4mom = 0;
+   //Gen_mu_4mom = 0;
    // Set branch addresses and branch pointers
 
    if (!tree) return;
@@ -422,7 +394,7 @@ void initOniaTree(TChain *tree)
    if (fChain->GetBranch("Reco_mu_pt_global")) fChain->SetBranchAddress("Reco_mu_pt_global", Reco_mu_pt_global, &b_Reco_mu_pt_global);
    if (fChain->GetBranch("Reco_mu_ptErr_inner")) fChain->SetBranchAddress("Reco_mu_ptErr_inner", Reco_mu_ptErr_inner, &b_Reco_mu_ptErr_inner);
    if (fChain->GetBranch("Reco_mu_ptErr_global")) fChain->SetBranchAddress("Reco_mu_ptErr_global", Reco_mu_ptErr_global, &b_Reco_mu_ptErr_global);
-   if (fChain->GetBranch("Gen_QQ_size")) fChain->SetBranchAddress("Gen_QQ_size", &Gen_QQ_size, &b_Gen_QQ_size);
+   /*if (fChain->GetBranch("Gen_QQ_size")) fChain->SetBranchAddress("Gen_QQ_size", &Gen_QQ_size, &b_Gen_QQ_size);
    if (fChain->GetBranch("Gen_QQ_type")) fChain->SetBranchAddress("Gen_QQ_type", Gen_QQ_type, &b_Gen_QQ_type);
    if (fChain->GetBranch("Gen_QQ_4mom")) fChain->SetBranchAddress("Gen_QQ_4mom", &Gen_QQ_4mom, &b_Gen_QQ_4mom);
    if (fChain->GetBranch("Gen_QQ_momId")) fChain->SetBranchAddress("Gen_QQ_momId", Gen_QQ_momId, &b_Gen_QQ_momId);
@@ -433,6 +405,6 @@ void initOniaTree(TChain *tree)
    if (fChain->GetBranch("Gen_mu_size")) fChain->SetBranchAddress("Gen_mu_size", &Gen_mu_size, &b_Gen_mu_size);
    if (fChain->GetBranch("Gen_mu_type")) fChain->SetBranchAddress("Gen_mu_type", Gen_mu_type, &b_Gen_mu_type);
    if (fChain->GetBranch("Gen_mu_charge")) fChain->SetBranchAddress("Gen_mu_charge", Gen_mu_charge, &b_Gen_mu_charge);
-   if (fChain->GetBranch("Gen_mu_4mom")) fChain->SetBranchAddress("Gen_mu_4mom", &Gen_mu_4mom, &b_Gen_mu_4mom);
+   if (fChain->GetBranch("Gen_mu_4mom")) fChain->SetBranchAddress("Gen_mu_4mom", &Gen_mu_4mom, &b_Gen_mu_4mom);*/
 }
 #endif // #ifndef initOniaTree_C
