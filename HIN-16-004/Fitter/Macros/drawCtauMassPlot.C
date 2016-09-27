@@ -1,14 +1,13 @@
-#ifndef drawMassPlot_C
-#define drawMassPlot_C
+#ifndef drawCtauMassPlot_C
+#define drawCtauMassPlot_C
 
 #include "Utilities/initClasses.h"
-#include "RooBinning.h"
 
-void setMassRange(RooWorkspace& myws, RooPlot* frame, string dsName, bool setLogScale, double dMuonYmin = -1., bool cutSideBand=false);
-void printMassParameters(RooWorkspace myws, TPad* Pad, bool isPbp, string pdfName, bool isWeighted);
-void printMassChi2(RooWorkspace& myws, TPad* Pad, RooPlot* frame, string varLabel, string dataLabel, string pdfLabel, int nBins, bool isWeighted); 
+void setInvMassRange(RooWorkspace& myws, RooPlot* frame, string dsName, bool setLogScale, double dMuonYmin = -1., bool cutSideBand=false);
+void printMassParameter(RooWorkspace myws, TPad* Pad, bool isPbp, string pdfName, bool isWeighted);
+void printInvMassChi2(RooWorkspace& myws, TPad* Pad, RooPlot* frame, string varLabel, string dataLabel, string pdfLabel, int nBins, bool isWeighted); 
 
-void drawMassPlot(RooWorkspace& myws,   // Local workspace
+void drawCtauMassPlot(RooWorkspace& myws,   // Local workspace
                   string outputDir,     // Output directory
 		  struct InputOpt opt,  // Variable with run information (kept for legacy purpose)
                   struct KinCuts cut,   // Variable with current kinematic cuts
@@ -17,6 +16,7 @@ void drawMassPlot(RooWorkspace& myws,   // Local workspace
                   string DSTAG,         // Specifies the type of datasets: i.e, DATA, MCJPSINP, ...
                   bool isPbp,          // Define if it is Pbp (True) or PP (False)
                   // Select the type of object to fit
+                  bool fitMass,         // Indicates if the mass is fitted
                   bool incJpsi,         // Includes Jpsi model
                   bool incPsi2S,        // Includes Psi(2S) model
                   bool incBkg,          // Includes Background model                  
@@ -28,85 +28,175 @@ void drawMassPlot(RooWorkspace& myws,   // Local workspace
                   bool incSS,           // Include Same Sign data
                   bool zoomPsi,         // Zoom Psi(2S) peak on extra pad
                   int  nBins,           // Number of bins used for plotting
-                  bool getMeanPT,       // Compute the mean PT (NEED TO FIX)
                   bool paperStyle=false,// if true, print less info
                   bool saveWS=true      // save the workspace into a file
                   ) 
 {
 
-
+  cout << "====================okB========================================" << endl;
+ 
   string dsOSName = Form("dOS_%s_%s", DSTAG.c_str(), (isPbp?"Pbp":"PP"));
   string dsSSName = Form("dSS_%s_%s", DSTAG.c_str(), (isPbp?"Pbp":"PP"));
   string pdfName  = Form("pdfMASS_Tot_%s", (isPbp?"Pbp":"PP"));
+  //pdfName  = Form("pdfCTAUMASS_Tot_%s", (isPbp?"Pbp":"PP"));
   if (plotPureSMC) dsOSName = Form("dOS_%s_%s_NoBkg", DSTAG.c_str(), (isPbp?"Pbp":"PP"));
     
   bool isWeighted = myws.data(dsOSName.c_str())->isWeighted();
   string cutSB = Form("(%.6f < invMass && invMass < %.6f)", cut.dMuon.M.Min, cut.dMuon.M.Max);
   cutSB = cutSB + "&&"+"((2.0 < invMass && invMass < 2.7) || (3.3 < invMass && invMass < 3.5) || (3.9 < invMass && invMass < 5.0))";
-  string cutSBLabel = "SideBandMID_FULL";
+  string cutSBLabel = "SideBandMID_FULL"; 
   if (cut.dMuon.M.Min < 2.9) { cutSBLabel = cutSBLabel + "," + "SideBandBOT_FULL"; } if (cut.dMuon.M.Max > 3.9) { cutSBLabel = cutSBLabel + "," + "SideBandTOP_FULL"; }
 
-  int BinNum = 0;
-  RooBinning rbm(cut.dMuon.M.Min,cut.dMuon.M.Max);
-  rbm.addUniform(BinNum,cut.dMuon.M.Min,cut.dMuon.M.Max);
-
+  cout << "====================okC========================================" << endl;
+  
+  /*
   // Create the main plot of the fit
+  RooPlot*   frame     = myws.var("invMass")->frame(Bins(nBins), Range(cut.dMuon.M.Min, cut.dMuon.M.Max));
+  myws.data(dsOSName.c_str())->plotOn(frame, Name("dOS"), DataError(RooAbsData::SumW2), XErrorSize(0), 
+				      MarkerColor(kBlack), LineColor(kBlack), MarkerSize(1.2));
+  
+  Double_t norm = myws.data(dsOSName.c_str())->sumEntries();
+  
+  myws.pdf(pdfName.c_str())->plotOn(frame,Name("PDF"),  Normalization(norm, RooAbsReal::NumEvent), LineColor(kBlack),
+				    LineStyle(1), Precision(1e-4), Range(cut.dMuon.M.Min, cut.dMuon.M.Max));
+  
+  myws.pdf(pdfName.c_str())->plotOn(frame,Name("JPSI1"),Components(RooArgSet(*myws.pdf(Form("pdfMASS_Jpsi_%s", (isPbp?"Pbp":"PP"))),*myws.pdf(Form("pdfMASS_Bkg_%s", (isPbp?"Pbp":"PP"))))), 
+				    Normalization(norm, RooAbsReal::NumEvent), 
+				    LineColor(kGreen+3), LineStyle(1), Precision(1e-4), 
+				    Range(cut.dMuon.M.Min, cut.dMuon.M.Max) );
+
+  //myws.pdf(pdfName.c_str())->plotOn(frame,Name("JPSI1"),Components(RooArgSet(*myws.pdf(Form("pdfCTAUMASS_Jpsi_%s", (isPbp?"Pbp":"PP"))),*myws.pdf(Form("pdfCTAUMASS_Bkg_%s", (isPbp?"Pbp":"PP"))))), 
+  //Normalization(norm, RooAbsReal::NumEvent), 
+  //				    LineColor(kGreen+3), LineStyle(1), Precision(1e-4), 
+  //				    Range(cut.dMuon.M.Min, cut.dMuon.M.Max) );
+  
+  myws.pdf(pdfName.c_str())->plotOn(frame,Name("BKG"),Components(RooArgSet(*myws.pdf(Form("pdfMASS_Bkg_%s", (isPbp?"Pbp":"PP"))))), Normalization(norm, RooAbsReal::NumEvent), Range(cut.dMuon.M.Min, cut.dMuon.M.Max), FillStyle(paperStyle ? 0 : 1001), FillColor(kAzure-9), VLines(), DrawOption("LCF"), LineColor(kBlue), LineStyle(kDashed) );
+
+  //myws.pdf(pdfName.c_str())->plotOn(frame,Name("BKG"),Components(RooArgSet(*myws.pdf(Form("pdfCTAUMASS_Bkg_%s", (isPbp?"Pbp":"PP"))))), 
+  //Normalization(norm, RooAbsReal::NumEvent), 
+  //Range(cut.dMuon.M.Min, cut.dMuon.M.Max), 
+  //FillStyle(paperStyle ? 0 : 1001), FillColor(kAzure-9), VLines(), 
+  //DrawOption("LCF"), LineColor(kBlue), LineStyle(kDashed) );
+  
+  myws.data(dsOSName.c_str())->plotOn(frame, Name("dOS"), DataError(RooAbsData::SumW2), XErrorSize(0), MarkerColor(kBlack), LineColor(kBlack), MarkerSize(1.2));
+  */
+ 
+   // Create the main plot of the fit
   RooPlot*   frame     = myws.var("invMass")->frame(Bins(nBins), Range(cut.dMuon.M.Min, cut.dMuon.M.Max));
   myws.data(dsOSName.c_str())->plotOn(frame, Name("dOS"), DataError(RooAbsData::SumW2), XErrorSize(0), MarkerColor(kBlack), LineColor(kBlack), MarkerSize(1.2));
   
-  // Create the pull distribution of the fit
   Double_t norm = myws.data(dsOSName.c_str())->sumEntries();
-  if (!paperStyle) {
-
-    if (incBkg && (!incJpsi && !incPsi2S)) {
-      myws.pdf(pdfName.c_str())->plotOn(frame,Name("PDF"), Normalization(norm, RooAbsReal::NumEvent), NormRange(cutSBLabel.c_str()), Range("FullWindow"), LineColor(kBlack), LineStyle(1), Precision(1e-4));
-    } else {
-      myws.pdf(pdfName.c_str())->plotOn(frame,Name("PDF"),  
-					FillColor(kBlack),FillStyle(3354),
-					Normalization(norm, RooAbsReal::NumEvent), 
-					Range(cut.dMuon.M.Min, cut.dMuon.M.Max));
+  if (plotPureSMC)
+  {
+    if (incJpsi && !incPsi2S)
+    {
+      if (cut.dMuon.AbsRap.Min >= 1.6) norm = myws.data(dsOSName.c_str())->reduce("invMass<3.32")->sumEntries();
+      else norm = myws.data(dsOSName.c_str())->reduce("invMass<3.26")->sumEntries();
     }
-
-    if (incJpsi) {
-      myws.pdf(pdfName.c_str())->plotOn(frame,Name("JPSI1"),Components(RooArgSet(*myws.pdf(Form("pdfMASSTot_Jpsi_%s", (isPbp?"Pbp":"PP"))),*myws.pdf(Form("pdfMASSTot_Bkg_%s", (isPbp?"Pbp":"PP"))))), 
-					FillColor(kWhite),FillStyle(1001),
-					LineColor(kGreen+2), LineStyle(1), Precision(1e-4), Range(cut.dMuon.M.Min, cut.dMuon.M.Max),
-					Normalization(norm, RooAbsReal::NumEvent));
-    }
-    else if (incPsi2S) {
-      myws.pdf(pdfName.c_str())->plotOn(frame,Name("PSI2S1"),Components(RooArgSet(*myws.pdf(Form("pdfMASSTot_Psi2S_%s", (isPbp?"Pbp":"PP"))),*myws.pdf(Form("pdfMASSTot_Bkg_%s", (isPbp?"Pbp":"PP"))))), Normalization(norm, RooAbsReal::NumEvent), FillColor(kWhite),FillStyle(1001),
-					LineColor(kGreen+2), LineStyle(1), Precision(1e-4), Range(cut.dMuon.M.Min, cut.dMuon.M.Max));
+    else if (!incJpsi && incPsi2S)
+    {
+//      if (cut.dMuon.AbsRap.Min >= 1.6) norm = myws.data(dsOSName.c_str())->reduce("invMass<3.32")->sumEntries();
+//      else norm = myws.data(dsOSName.c_str())->reduce("invMass<3.26")->sumEntries();
     }
   }
-  
+    
+  if (!paperStyle) {
+    if (incJpsi) {
+      if (incBkg) {
+	if ( myws.pdf(Form("pdfMASS2_Jpsi_%s", (isPbp?"Pbp":"PP"))) ) {
+	  myws.pdf(pdfName.c_str())->plotOn(frame,Name("JPSI1"), Components(RooArgSet(*myws.pdf(Form("pdfMASS1_Jpsi_%s", (isPbp?"Pbp":"PP"))),*myws.pdf(Form("pdfMASSTot_Bkg_%s", (isPbp?"Pbp":"PP"))))),
+					    Normalization(norm, RooAbsReal::NumEvent), 
+					    LineColor(kGreen+3), LineStyle(1), Precision(1e-4), Range(cut.dMuon.M.Min, cut.dMuon.M.Max)
+					    );
+	  myws.pdf(pdfName.c_str())->plotOn(frame,Name("JPSI2"),Components(RooArgSet(*myws.pdf(Form("pdfMASS2_Jpsi_%s", (isPbp?"Pbp":"PP"))),*myws.pdf(Form("pdfMASSTot_Bkg_%s", (isPbp?"Pbp":"PP"))))),
+					    Normalization(norm, RooAbsReal::NumEvent), 
+					    LineColor(kOrange+2), LineStyle(1), Precision(1e-4), Range(cut.dMuon.M.Min, cut.dMuon.M.Max)
+					    );
+	} else {
+	  myws.pdf(pdfName.c_str())->plotOn(frame,Name("JPSI1"),Components(RooArgSet(*myws.pdf(Form("pdfMASSTot_Jpsi_%s", (isPbp?"Pbp":"PP"))),*myws.pdf(Form("pdfMASSTot_Bkg_%s", (isPbp?"Pbp":"PP"))))),
+					    Normalization(norm, RooAbsReal::NumEvent), 
+					    LineColor(kGreen+3), LineStyle(1), Precision(1e-4), Range(cut.dMuon.M.Min, cut.dMuon.M.Max)
+					    );
+	}
+      } else {
+	if ( myws.pdf(Form("pdfMASS2_Jpsi_%s", (isPbp?"Pbp":"PP"))) ) {
+	  myws.pdf(pdfName.c_str())->plotOn(frame,Name("JPSI1"),Components(RooArgSet(*myws.pdf(Form("pdfMASS1_Jpsi_%s", (isPbp?"Pbp":"PP"))))),
+					    Normalization(norm, RooAbsReal::NumEvent), 
+					    LineColor(kGreen+3), LineStyle(1), Precision(1e-4), Range(cut.dMuon.M.Min, cut.dMuon.M.Max)
+					    );
+	  myws.pdf(pdfName.c_str())->plotOn(frame,Name("JPSI2"),Components(RooArgSet(*myws.pdf(Form("pdfMASS2_Jpsi_%s", (isPbp?"Pbp":"PP"))))),
+					    Normalization(norm, RooAbsReal::NumEvent), 
+					    LineColor(kOrange+2), LineStyle(1), Precision(1e-4), Range(cut.dMuon.M.Min, cut.dMuon.M.Max)
+					    );
+	} else {
+	  myws.pdf(pdfName.c_str())->plotOn(frame,Name("JPSI1"),Components(RooArgSet(*myws.pdf(Form("pdfMASSTot_Jpsi_%s", (isPbp?"Pbp":"PP"))))),
+					    Normalization(norm, RooAbsReal::NumEvent), 
+					    LineColor(kGreen+3), LineStyle(1), Precision(1e-4), Range(cut.dMuon.M.Min, cut.dMuon.M.Max)
+					    );
+	}
+      }
+    }
+    if (incPsi2S) {
+      if (incBkg) {
+	if ( myws.pdf(Form("pdfMASS2_Psi2S_%s", (isPbp?"Pbp":"PP"))) ) {
+	  myws.pdf(pdfName.c_str())->plotOn(frame,Name("PSI2S1"),Components(RooArgSet(*myws.pdf(Form("pdfMASS1_Psi2S_%s", (isPbp?"Pbp":"PP"))),*myws.pdf(Form("pdfMASSTot_Bkg_%s", (isPbp?"Pbp":"PP"))))),
+					    Normalization(norm, RooAbsReal::NumEvent), 
+					    LineColor(kGreen+3), LineStyle(1), Precision(1e-4), Range(cut.dMuon.M.Min, cut.dMuon.M.Max)
+					    );
+	  myws.pdf(pdfName.c_str())->plotOn(frame,Name("PSI2S2"),Components(RooArgSet(*myws.pdf(Form("pdfMASS2_Psi2S_%s", (isPbp?"Pbp":"PP"))),*myws.pdf(Form("pdfMASSTot_Bkg_%s", (isPbp?"Pbp":"PP"))))),
+					    Normalization(norm, RooAbsReal::NumEvent), 
+					    LineColor(kOrange+2), LineStyle(1), Precision(1e-4), Range(cut.dMuon.M.Min, cut.dMuon.M.Max)
+					    );
+	} else {
+	  myws.pdf(pdfName.c_str())->plotOn(frame,Name("PSI2S1"),Components(RooArgSet(*myws.pdf(Form("pdfMASSTot_Psi2S_%s", (isPbp?"Pbp":"PP"))),*myws.pdf(Form("pdfMASSTot_Bkg_%s", (isPbp?"Pbp":"PP"))))),
+					    Normalization(norm, RooAbsReal::NumEvent), 
+					    LineColor(kGreen+3), LineStyle(1), Precision(1e-4), Range(cut.dMuon.M.Min, cut.dMuon.M.Max)
+					    );
+	}
+      } else {
+	if ( myws.pdf(Form("pdfMASS2_Psi2S_%s", (isPbp?"Pbp":"PP"))) ) {
+	  myws.pdf(pdfName.c_str())->plotOn(frame,Name("PSI2S1"),Components(RooArgSet(*myws.pdf(Form("pdfMASS1_Psi2S_%s", (isPbp?"Pbp":"PP"))))),
+					    Normalization(norm, RooAbsReal::NumEvent), 
+					    LineColor(kGreen+3), LineStyle(1), Precision(1e-4), Range(cut.dMuon.M.Min, cut.dMuon.M.Max)
+					    );
+	  myws.pdf(pdfName.c_str())->plotOn(frame,Name("PSI2S2"),Components(RooArgSet(*myws.pdf(Form("pdfMASS2_Psi2S_%s", (isPbp?"Pbp":"PP"))))),
+					    Normalization(norm, RooAbsReal::NumEvent), 
+					    LineColor(kOrange+2), LineStyle(1), Precision(1e-4), Range(cut.dMuon.M.Min, cut.dMuon.M.Max)
+					    );
+	} else {
+	  myws.pdf(pdfName.c_str())->plotOn(frame,Name("PSI2S1"),Components(RooArgSet(*myws.pdf(Form("pdfMASSTot_Psi2S_%s", (isPbp?"Pbp":"PP"))))),
+					    Normalization(norm, RooAbsReal::NumEvent), 
+					    LineColor(kGreen+3), LineStyle(1), Precision(1e-4), Range(cut.dMuon.M.Min, cut.dMuon.M.Max)
+					    );
+	}
+      }
+    }
+  }
   if (incBkg && (!incJpsi && !incPsi2S)) {
     myws.pdf(pdfName.c_str())->plotOn(frame,Name("BKG"),Components(RooArgSet(*myws.pdf(Form("pdfMASSTot_Bkg_%s", (isPbp?"Pbp":"PP"))))),
                                       Normalization(norm, RooAbsReal::NumEvent), NormRange(cutSBLabel.c_str()),
-                                      FillStyle(paperStyle ? 0 : 1001), FillColor(kAzure-9), VLines(), DrawOption("LCF"), LineColor(kBlue), LineStyle(kDashed));
+                                      FillStyle(paperStyle ? 0 : 1001), FillColor(kAzure-9), VLines(), DrawOption("LCF"), LineColor(kBlue), LineStyle(kDashed)
+                                      );
   } 
-  
   if (incBkg && (incJpsi || incPsi2S)) {
-    myws.pdf(pdfName.c_str())->plotOn(frame,Name("BKG"),Components(RooArgSet(*myws.pdf(Form("pdfMASSTot_Bkg_%s", (isPbp?"Pbp":"PP"))))), DrawOption("F"), FillColor(kAzure-9), FillStyle(1001), LineColor(kBlue), LineStyle(kDashed), Normalization(norm, RooAbsReal::NumEvent));
-    
-    myws.pdf(pdfName.c_str())->plotOn(frame,Name("BKG"),Components(RooArgSet(*myws.pdf(Form("pdfMASSTot_Bkg_%s", (isPbp?"Pbp":"PP"))))), LineColor(kBlue), LineStyle(7), LineWidth(5), Normalization(norm,RooAbsReal::NumEvent));
-
+    myws.pdf(pdfName.c_str())->plotOn(frame,Name("BKG"),Components(RooArgSet(*myws.pdf(Form("pdfMASSTot_Bkg_%s", (isPbp?"Pbp":"PP"))))),
+                                      Normalization(norm, RooAbsReal::NumEvent),
+                                      Range(cut.dMuon.M.Min, cut.dMuon.M.Max), FillStyle(paperStyle ? 0 : 1001), FillColor(kAzure-9), VLines(), DrawOption("LCF"), LineColor(kBlue), LineStyle(kDashed)
+                                      );
   } 
-  
   if (incSS) { 
     myws.data(dsSSName.c_str())->plotOn(frame, Name("dSS"), MarkerColor(kRed), LineColor(kRed), MarkerSize(1.2)); 
   }
-  
-  myws.data(dsOSName.c_str())->plotOn(frame, Name("dOS"), DataError(RooAbsData::SumW2), XErrorSize(0), MarkerColor(kBlack), LineColor(kBlack), MarkerSize(1.2));  
-
+  myws.data(dsOSName.c_str())->plotOn(frame, Name("dOS"), DataError(RooAbsData::SumW2), XErrorSize(0), MarkerColor(kBlack), LineColor(kBlack), MarkerSize(1.2));
   if (incBkg && (!incJpsi && !incPsi2S)) {
     myws.pdf(pdfName.c_str())->plotOn(frame,Name("PDF"), Normalization(norm, RooAbsReal::NumEvent), NormRange(cutSBLabel.c_str()), Range("FullWindow"), LineColor(kBlack), LineStyle(1), Precision(1e-4));
   } else {
     myws.pdf(pdfName.c_str())->plotOn(frame,Name("PDF"),  Normalization(norm, RooAbsReal::NumEvent), 
                                       LineColor(kBlack), LineStyle(1), Precision(1e-4), Range(cut.dMuon.M.Min, cut.dMuon.M.Max));
   }
-  
-  // Create the pull distribution of the fit
 
+
+  // Create the pull distribution of the fit
   RooHist *hpull = frame->pullHist(0, 0, true);
   hpull->SetName("hpull");
   RooPlot* frame2 = myws.var("invMass")->frame(Title("Pull Distribution"), Bins(nBins), Range(cut.dMuon.M.Min, cut.dMuon.M.Max));
@@ -198,7 +288,7 @@ void drawMassPlot(RooWorkspace& myws,   // Local workspace
      frame->GetXaxis()->SetTitleOffset(0.9);
      frame->GetYaxis()->SetTitleOffset(1.45);
   }
-  setMassRange(myws, frame, dsOSName, setLogScale, cut.dMuon.AbsRap.Min, (incBkg&&(!incJpsi&&!incPsi2S)) );
+  setInvMassRange(myws, frame, dsOSName, setLogScale, cut.dMuon.AbsRap.Min, (incBkg&&(!incJpsi&&!incPsi2S)) );
   if (paperStyle) {
      double Ydown = frame->GetMinimum();
      double Yup = 0.9*frame->GetMaximum();
@@ -216,7 +306,7 @@ void drawMassPlot(RooWorkspace& myws,   // Local workspace
   pad1->cd(); 
   frame->Draw();
 
-  if (!zoomPsi) { printMassParameters(myws, pad1, isPbp, pdfName, isWeighted); }
+  if (!zoomPsi) { printMassParameter(myws, pad1, isPbp, pdfName, isWeighted); }
   pad1->SetLogy(setLogScale);
 
   // Drawing the text in the plot
@@ -225,31 +315,18 @@ void drawMassPlot(RooWorkspace& myws,   // Local workspace
   
   t->SetTextSize(0.03);
   if (!paperStyle) { // do not print selection details for paper style
-    t->DrawLatex(0.21, 0.86-dy, "Soft Muon ID"); dy+=0.045;
+    t->DrawLatex(0.21, 0.86-dy, "2015 HI Soft Muon ID"); dy+=0.045;
     if (cutCtau) { t->DrawLatex(0.21, 0.86-dy, "#font[12]{l}_{J/#psi} cuts applied"); dy+=0.045; }
     if (isPbp) {
-      t->DrawLatex(0.21, 0.86-dy, "HLT PAL1DoubleMuOpen v1"); dy+=0.045;
+      t->DrawLatex(0.21, 0.86-dy, "HLT_HIL1DoubleMu0_v1"); dy+=0.045;
     } else {
       t->DrawLatex(0.21, 0.86-dy, "HLT_HIL1DoubleMu0_v1"); dy+=0.045;
     } 
   }
-  //if (isPbp) {t->DrawLatex(0.21, 0.86-dy, Form("Cent. %d-%d%%", (int)(cut.Centrality.Start/2), (int)(cut.Centrality.End/2))); dy+=0.045;}
-  float rapMin = cut.dMuon.AbsRap.Min;
-  float rapMax = cut.dMuon.AbsRap.Max;
-  if (isPbp) {cut.dMuon.AbsRap.Min = -1*(rapMax + 0.47); cut.dMuon.AbsRap.Max = -1*(rapMin + 0.47);}
+  if (isPbp) {t->DrawLatex(0.21, 0.86-dy, Form("Cent. %d-%d%%", (int)(cut.Centrality.Start/2), (int)(cut.Centrality.End/2))); dy+=0.045;}
   t->DrawLatex(0.21, 0.86-dy, Form("%.1f #leq p_{T}^{#mu#mu} < %.1f GeV/c",cut.dMuon.Pt.Min,cut.dMuon.Pt.Max)); dy+=0.045;
-  t->DrawLatex(0.21, 0.86-dy, Form("%.2f #leq y_{CM} < %.2f",cut.dMuon.AbsRap.Min,cut.dMuon.AbsRap.Max)); dy+=1.5*0.045;
-  if (getMeanPT){
-    if (incJpsi) {
-      t->DrawLatex(0.19, 0.86-dy, Form("<pt_{J/#psi}> = %.2f#pm%.2f GeV/c", myws.var(Form("ptJpsi%s", (isPbp?"Pbp":"PP")))->getValV(), myws.var(Form("ptJpsi%s", (isPbp?"Pbp":"PP")))->getError())); dy+=0.045;
-    }
-    if (incPsi2S) {
-      t->DrawLatex(0.19, 0.86-dy, Form("<pt_{#psi(2S)}> = %.2f#pm%.2f GeV/c", myws.var(Form("ptPsi2S%s", (isPbp?"Pbp":"PP")))->getValV(), myws.var(Form("ptPsi2S%s", (isPbp?"Pbp":"PP")))->getError())); dy+=0.045;
-    }
-    if (incBkg) {
-      t->DrawLatex(0.19, 0.86-dy, Form("<pt_{bkg}> = %.2f#pm%.2f GeV/c", myws.var(Form("ptBkg%s", (isPbp?"Pbp":"PP")))->getValV(), myws.var(Form("ptBkg%s", (isPbp?"Pbp":"PP")))->getError())); dy+=0.045;
-    }
-  }
+  t->DrawLatex(0.21, 0.86-dy, Form("%.1f #leq |y^{#mu#mu}| < %.1f",cut.dMuon.AbsRap.Min,cut.dMuon.AbsRap.Max)); dy+=1.5*0.045;
+  
 
   // Drawing the Legend
   double ymin = 0.7802;
@@ -300,7 +377,7 @@ void drawMassPlot(RooWorkspace& myws,   // Local workspace
        framezoom->GetYaxis()->SetTitleSize(0.072);
        framezoom->GetXaxis()->SetTitleSize(0.072);
     // }
-    setMassRange(myws, framezoom, dsOSName, setLogScale, cut.dMuon.AbsRap.Min);
+    setInvMassRange(myws, framezoom, dsOSName, setLogScale, cut.dMuon.AbsRap.Min);
 
     pad4->Draw();
     pad4->cd();
@@ -331,7 +408,7 @@ void drawMassPlot(RooWorkspace& myws,   // Local workspace
     frame2->Draw(); 
   
     // *** Print chi2/ndof 
-    printMassChi2(myws, pad2, frame, "invMass", dsOSName.c_str(), pdfName.c_str(), nBins, isWeighted);
+    printInvMassChi2(myws, pad2, frame, "invMass", dsOSName.c_str(), pdfName.c_str(), nBins, isWeighted);
   
     pline->Draw("same");
     pad2->Update();
@@ -339,11 +416,11 @@ void drawMassPlot(RooWorkspace& myws,   // Local workspace
   
   bool SB = (incBkg&&(!incPsi2S&&!incJpsi));
   // Save the plot in different formats
-  gSystem->mkdir(Form("%splot/%s/mass%s/root/", outputDir.c_str(), DSTAG.c_str(), SB?"SB":""), kTRUE); 
-  cFig->SaveAs(Form("%splot/%s/mass%s/root/%s_%s_%s%s_pt%.0f%.0f_rap%.0f%.0f_cent%d%d.root", outputDir.c_str(), DSTAG.c_str(), SB?"SB":"", DSTAG.c_str(),  "Psi2SJpsi", (isPbp?"Pbp":"PP"), plotLabel.c_str(), (cut.dMuon.Pt.Min*10.0), (cut.dMuon.Pt.Max*10.0), (cut.dMuon.AbsRap.Min*10.0), (cut.dMuon.AbsRap.Max*10.0), cut.Centrality.Start, cut.Centrality.End));
-  gSystem->mkdir(Form("%splot/%s/mass%s/png/", outputDir.c_str(), DSTAG.c_str(), SB?"SB":""), kTRUE);
-  cFig->SaveAs(Form("%splot/%s/mass%s/png/%s_%s_%s%s_pt%.0f%.0f_rap%.0f%.0f_cent%d%d.png", outputDir.c_str(), DSTAG.c_str(), SB?"SB":"", DSTAG.c_str(), "Psi2SJpsi", (isPbp?"Pbp":"PP"), plotLabel.c_str(), (cut.dMuon.Pt.Min*10.0), (cut.dMuon.Pt.Max*10.0), (cut.dMuon.AbsRap.Min*10.0), (cut.dMuon.AbsRap.Max*10.0), cut.Centrality.Start, cut.Centrality.End));
-  gSystem->mkdir(Form("%splot/%s/mass%s/pdf/", outputDir.c_str(), DSTAG.c_str(), SB?"SB":""), kTRUE);
+  gSystem->mkdir(Form("%splot/%s/Projmass%s/root/", outputDir.c_str(), DSTAG.c_str(), SB?"SB":""), kTRUE); 
+  cFig->SaveAs(Form("%splot/%s/Projmass%s/root/%s_%s_%s%s_pt%.0f%.0f_rap%.0f%.0f_cent%d%d.root", outputDir.c_str(), DSTAG.c_str(), SB?"SB":"", DSTAG.c_str(),  "Psi2SJpsi", (isPbp?"Pbp":"PP"), plotLabel.c_str(), (cut.dMuon.Pt.Min*10.0), (cut.dMuon.Pt.Max*10.0), (cut.dMuon.AbsRap.Min*10.0), (cut.dMuon.AbsRap.Max*10.0), cut.Centrality.Start, cut.Centrality.End));
+  gSystem->mkdir(Form("%splot/%s/Projmass%s/png/", outputDir.c_str(), DSTAG.c_str(), SB?"SB":""), kTRUE);
+  cFig->SaveAs(Form("%splot/%s/Projmass%s/png/%s_%s_%s%s_pt%.0f%.0f_rap%.0f%.0f_cent%d%d.png", outputDir.c_str(), DSTAG.c_str(), SB?"SB":"", DSTAG.c_str(), "Psi2SJpsi", (isPbp?"Pbp":"PP"), plotLabel.c_str(), (cut.dMuon.Pt.Min*10.0), (cut.dMuon.Pt.Max*10.0), (cut.dMuon.AbsRap.Min*10.0), (cut.dMuon.AbsRap.Max*10.0), cut.Centrality.Start, cut.Centrality.End));
+  gSystem->mkdir(Form("%splot/%s/Projmass%s/pdf/", outputDir.c_str(), DSTAG.c_str(), SB?"SB":""), kTRUE);
   cFig->SaveAs(Form("%splot/%s/mass%s/pdf/%s_%s_%s%s_pt%.0f%.0f_rap%.0f%.0f_cent%d%d.pdf", outputDir.c_str(), DSTAG.c_str(), SB?"SB":"", DSTAG.c_str(), "Psi2SJpsi", (isPbp?"Pbp":"PP"), plotLabel.c_str(), (cut.dMuon.Pt.Min*10.0), (cut.dMuon.Pt.Max*10.0), (cut.dMuon.AbsRap.Min*10.0), (cut.dMuon.AbsRap.Max*10.0), cut.Centrality.Start, cut.Centrality.End));
   
   cFig->Clear();
@@ -351,7 +428,7 @@ void drawMassPlot(RooWorkspace& myws,   // Local workspace
  
 }
 
-void setMassRange(RooWorkspace& myws, RooPlot* frame, string dsName, bool setLogScale, double dMuonYmin, bool cutSideBand)
+void setInvMassRange(RooWorkspace& myws, RooPlot* frame, string dsName, bool setLogScale, double dMuonYmin, bool cutSideBand)
 {  
   // Find maximum and minimum points of Plot to rescale Y axis
   TH1* h = myws.data(dsName.c_str())->createHistogram("hist", *myws.var("invMass"), Binning(frame->GetNbinsX(),frame->GetXaxis()->GetXmin(),frame->GetXaxis()->GetXmax()));
@@ -414,7 +491,7 @@ void setMassRange(RooWorkspace& myws, RooPlot* frame, string dsName, bool setLog
 }
 
 
-void printMassParameters(RooWorkspace myws, TPad* Pad, bool isPbp, string pdfName, bool isWeighted)
+void printMassParameter(RooWorkspace myws, TPad* Pad, bool isPbp, string pdfName, bool isWeighted)
 {
   Pad->cd();
   TLatex *t = new TLatex(); t->SetNDC(); t->SetTextSize(0.026); float dy = 0.025; 
@@ -464,7 +541,7 @@ void printMassParameters(RooWorkspace myws, TPad* Pad, bool isPbp, string pdfNam
 }
 
 
-void printMassChi2(RooWorkspace& myws, TPad* Pad, RooPlot* frame, string varLabel, string dataLabel, string pdfLabel, int nBins, bool isWeighted) 
+void printInvMassChi2(RooWorkspace& myws, TPad* Pad, RooPlot* frame, string varLabel, string dataLabel, string pdfLabel, int nBins, bool isWeighted) 
 {
   double chi2=0; unsigned int ndof=0;
   Pad->cd();
@@ -493,4 +570,4 @@ void printMassChi2(RooWorkspace& myws, TPad* Pad, RooPlot* frame, string varLabe
   delete hpull;
 };
 
-#endif // #ifndef drawMassPlot_C
+#endif // #ifndef drawCtauMassPlot_C

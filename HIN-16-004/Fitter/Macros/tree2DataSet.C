@@ -40,7 +40,8 @@ bool tree2DataSet(RooWorkspace& Workspace, vector<string> InputFileNames, string
   if (DSName.find("PP")!=std::string::npos) isPP =true;
 
   bool applyWeight = false;
-  if (isMC && !isPP) applyWeight = true;
+  //if (isMC && !isPP) applyWeight = true;
+  applyWeight = false;
   
   bool isPureSDataset = false;
   if (OutputFileName.find("_PureS")!=std::string::npos) isPureSDataset = true;
@@ -56,10 +57,13 @@ bool tree2DataSet(RooWorkspace& Workspace, vector<string> InputFileNames, string
 
     RooRealVar* mass     = new RooRealVar("invMass","#mu#mu mass", 2.0, 5.0, "GeV/c^{2}");
     RooRealVar* ctau     = new RooRealVar("ctau","c_{#tau}", -100.0, 100.0, "mm");
-    RooRealVar* ctauTrue = new RooRealVar("ctauTrue","c_{#tau}", -100.0, 100.0, "mm");
     RooRealVar* ctauErr  = new RooRealVar("ctauErr","#sigma_{c#tau}", -100.0, 100.0, "mm");	
+    RooRealVar* ctauTrue = new RooRealVar("ctauTrue","c_{#tau}", -100.0, 100.0, "mm");
     RooRealVar* ptQQ     = new RooRealVar("pt","#mu#mu p_{T}", 0.0, 50.0, "GeV/c");
     RooRealVar* rapQQ    = new RooRealVar("rap","#mu#mu y", -2.4, 2.4, "");
+    RooRealVar* Ntrk     = new RooRealVar("Ntracks","number of tracks in the event",0.,400.);
+    RooRealVar* ETHF     = new RooRealVar("SumET_HFEta4","sum of ET in HF plusEta4 and minusEta4",0.,400.);
+    RooRealVar* Zvtx     = new RooRealVar("Zvtx","primary Z vertex for each events",-30.,30.);
     RooRealVar* cent     = new RooRealVar("cent","centrality", 0.0, 200.0, "");
     RooRealVar* weight   = new RooRealVar("weight","MC weight", 0.0, 1.0, "");
     RooArgSet*  cols     = NULL;
@@ -68,9 +72,9 @@ bool tree2DataSet(RooWorkspace& Workspace, vector<string> InputFileNames, string
     {
       setCentralityMap(Form("%s/Input/CentralityMap_PbPb2015.txt",gSystem->ExpandPathName(gSystem->pwd())));
       if (isMC) {
-        cols = new RooArgSet(*mass, *ctau, *ctauErr, *ctauTrue, *ptQQ, *rapQQ, *cent, *weight);
+        cols = new RooArgSet(*mass, *ctau, *ctauErr, *ctauTrue, *ptQQ, *rapQQ, *Ntrk, *ETHF,  *weight);
       } else {
-        cols = new RooArgSet(*mass, *ctau, *ctauErr, *ptQQ, *rapQQ, *cent, *weight);
+        cols = new RooArgSet(*mass, *ctau, *ctauErr, *ptQQ, *rapQQ, *Ntrk, *ETHF, *weight);
       }
       dataOS = new RooDataSet(Form("dOS_%s", DSName.c_str()), "dOS", *cols, WeightVar(*weight), StoreAsymError(*mass));
       dataSS = new RooDataSet(Form("dSS_%s", DSName.c_str()), "dSS", *cols, WeightVar(*weight), StoreAsymError(*mass));
@@ -79,9 +83,9 @@ bool tree2DataSet(RooWorkspace& Workspace, vector<string> InputFileNames, string
     else
     {
       if (isMC) {
-        cols = new RooArgSet(*mass, *ctau, *ctauErr, *ctauTrue, *ptQQ, *rapQQ, *cent);
+        cols = new RooArgSet(*mass, *ctau, *ctauErr, *ctauTrue, *ptQQ, *rapQQ, *Ntrk, *ETHF);
       } else {
-        cols = new RooArgSet(*mass, *ctau, *ctauErr, *ptQQ, *rapQQ, *cent);
+        cols = new RooArgSet(*mass, *ctau, *ctauErr, *ptQQ, *rapQQ, *Ntrk, *ETHF);
       }                 
       dataOS = new RooDataSet(Form("dOS_%s", DSName.c_str()), "dOS", *cols, StoreAsymError(*mass));
       dataSS = new RooDataSet(Form("dSS_%s", DSName.c_str()), "dSS", *cols, StoreAsymError(*mass));
@@ -113,9 +117,15 @@ bool tree2DataSet(RooWorkspace& Workspace, vector<string> InputFileNames, string
         ctau->setVal(Reco_QQ_ctau[iQQ]);
         ctauErr->setVal(Reco_QQ_ctauErr[iQQ]);
         ptQQ->setVal(RecoQQ4mom->Pt());
-        rapQQ->setVal(RecoQQ4mom->Rapidity());
-        cent->setVal(Centrality);
-        if (isMC) {
+	rapQQ->setVal(RecoQQ4mom->Rapidity());
+	//if(runNb >= 211313 && runNb <= 211631){
+	//double rapval = (-1)*RecoQQ4mom->Rapidity();
+	//rapQQ->setVal(rapval);
+	//}
+	Ntrk->setVal(Ntracks);
+	ETHF->setVal(SumET_HFplusEta4 + SumET_HFminusEta4);
+	Zvtx->setVal(zVtx);
+	if (isMC) {
           ctauTrue->setVal(Reco_QQ_ctauTrue[iQQ]);
         } 
 	
@@ -140,11 +150,14 @@ bool tree2DataSet(RooWorkspace& Workspace, vector<string> InputFileNames, string
 	  }
       }
     }
+    
+    cout<<"====================ok===================================="<<endl;
     // Close the TChain and all its pointers
     delete Reco_QQ_4mom; delete Reco_QQ_mumi_4mom; delete Reco_QQ_mupl_4mom; 
     delete Gen_QQ_mumi_4mom; delete Gen_QQ_mupl_4mom;
     theTree->Reset(); delete theTree;
     
+    cout<<"====================ok1===================================="<<endl;
     // Save all the datasets
     TFile *DBFile = TFile::Open(OutputFileName.c_str(),"RECREATE");
     DBFile->cd();
@@ -170,6 +183,8 @@ bool tree2DataSet(RooWorkspace& Workspace, vector<string> InputFileNames, string
     DBFile->Close(); delete DBFile;
   }
 
+  cout<<"====================ok2===================================="<<endl;
+
   // Import datasets to workspace
   if (isMC && isPureSDataset)
   {
@@ -182,9 +197,10 @@ bool tree2DataSet(RooWorkspace& Workspace, vector<string> InputFileNames, string
     Workspace.import(*dataOS);
     Workspace.import(*dataSS);
   }
-
+  
   // delete the local datasets
   delete dataSS; delete dataOS; delete dataOSNoBkg;
+  cout<<"====================ok3===================================="<<endl;
 						   
   return true;
 };
@@ -223,14 +239,19 @@ void iniBranch(TChain* fChain, bool isMC)
   }
   fChain->SetBranchStatus("*",0);
   RecoQQ::iniBranches(fChain); 
-  fChain->SetBranchStatus("Centrality",1); 
+  fChain->SetBranchStatus("runNb",1);
+  fChain->SetBranchStatus("Ntracks",1);
+  fChain->SetBranchStatus("SumET_HFplusEta4",1);
+  fChain->SetBranchStatus("SumET_HFminusEta4",1);
+  fChain->SetBranchStatus("zVtx",1);
   fChain->SetBranchStatus("Reco_QQ_size",1); 
   fChain->SetBranchStatus("Reco_QQ_sign",1); 
   fChain->SetBranchStatus("Reco_QQ_4mom",1); 
   fChain->SetBranchStatus("Reco_QQ_mupl_4mom",1); 
   fChain->SetBranchStatus("Reco_QQ_mumi_4mom",1);
   fChain->SetBranchStatus("Reco_QQ_ctau",1); 
-  fChain->SetBranchStatus("Reco_QQ_ctauErr",1);  
+  fChain->SetBranchStatus("Reco_QQ_ctauErr",1); 
+  
   if (isMC)
   {
     fChain->SetBranchStatus("Gen_QQ_size",1);

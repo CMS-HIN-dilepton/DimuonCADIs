@@ -10,7 +10,8 @@
 
 namespace HI {
   enum TRIGGERBIT {
-    HLT_HIL1DoubleMu0_v1 = 0,
+    HLT_PAL1DoubleMuOpen_v1 = 0,
+    //HLT_HIL1DoubleMu0_v1 = 0,
     HLT_HIL1DoubleMu0_2HF_v1 = 1,
     HLT_HIL1DoubleMu0_2HF0_v1 = 2,
     HLT_HIL1DoubleMu10_v1 = 3,
@@ -111,9 +112,9 @@ namespace RecoQQ {
     fChain->SetBranchStatus("HLTriggers",1); 
     fChain->SetBranchStatus("Reco_QQ_trig",1);
     fChain->SetBranchStatus("Reco_QQ_VtxProb",1); 
-
-    fChain->SetBranchStatus("Reco_QQ_mupl_highPurity",1);
-    fChain->SetBranchStatus("Reco_QQ_mumi_highPurity",1);
+    
+    fChain->SetBranchStatus("Reco_QQ_mupl_isHighPurity",1);
+    fChain->SetBranchStatus("Reco_QQ_mumi_isHighPurity",1);
     fChain->SetBranchStatus("Reco_QQ_mupl_TrkMuArb",1);
     fChain->SetBranchStatus("Reco_QQ_mumi_TrkMuArb",1);
     fChain->SetBranchStatus("Reco_QQ_mupl_TMOneStaTight",1);
@@ -198,7 +199,7 @@ namespace RecoQQ {
   {
     Bool_t cond = true;
     
-    cond = cond && (Reco_QQ_mumi_highPurity[iRecoQQ]);
+    cond = cond && (Reco_QQ_mumi_isHighPurity[iRecoQQ]);
     cond = cond && (Reco_QQ_mumi_TrkMuArb[iRecoQQ]==1);
     cond = cond && (Reco_QQ_mumi_TMOneStaTight[iRecoQQ]==1);
     cond = cond && (Reco_QQ_mumi_nTrkWMea[iRecoQQ] > 5);
@@ -209,7 +210,7 @@ namespace RecoQQ {
     
     
     //cond = cond && (Reco_QQ_mupl_isGoodMuon[iRecoQQ]==1);
-    cond = cond && (Reco_QQ_mupl_highPurity[iRecoQQ]);
+    cond = cond && (Reco_QQ_mupl_isHighPurity[iRecoQQ]);
     cond = cond && (Reco_QQ_mupl_TrkMuArb[iRecoQQ]==1);
     cond = cond && (Reco_QQ_mupl_TMOneStaTight[iRecoQQ]==1);
     cond = cond && (Reco_QQ_mupl_nTrkWMea[iRecoQQ] > 5);
@@ -228,14 +229,14 @@ namespace RecoQQ {
   {
     Bool_t cond = true;
     
-    // cond = cond && (Reco_QQ_mumi_highPurity[iRecoQQ]);
+    // cond = cond && (Reco_QQ_mumi_isHighPurity[iRecoQQ]);
     //cond = cond && (Reco_QQ_mumi_isGoodMuon[iRecoQQ]==1);
     cond = cond && (Reco_QQ_mumi_nTrkWMea[iRecoQQ] > 5);
     cond = cond && (Reco_QQ_mumi_nPixWMea[iRecoQQ] > 0);
     cond = cond && (fabs(Reco_QQ_mumi_dxy[iRecoQQ]) < 0.3);
     cond = cond && (fabs(Reco_QQ_mumi_dz[iRecoQQ]) < 20.);
     
-    // cond = cond && (Reco_QQ_mupl_highPurity[iRecoQQ]);
+    // cond = cond && (Reco_QQ_mupl_isHighPurity[iRecoQQ]);
     //cond = cond && (Reco_QQ_mupl_isGoodMuon[iRecoQQ]==1);
     cond = cond && (Reco_QQ_mupl_nTrkWMea[iRecoQQ] > 5);
     cond = cond && (Reco_QQ_mupl_nPixWMea[iRecoQQ] > 0);

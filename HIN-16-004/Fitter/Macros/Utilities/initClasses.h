@@ -88,7 +88,7 @@ typedef struct SiMuonPar {
 
 typedef struct InputOpt {
   int        oniaMode;
-  EvtPar     PbPb, pp;
+  EvtPar     PbPb, Pbp, pp;
 } InputOpt;
 
 typedef struct KinCuts {
@@ -97,11 +97,11 @@ typedef struct KinCuts {
   DiMuonPar  dMuon;
 } KinCuts;
 
-bool isEqualKinCuts(struct KinCuts cutA, struct KinCuts cutB, bool isPbPb) 
+bool isEqualKinCuts(struct KinCuts cutA, struct KinCuts cutB, bool isPbp) 
 {
   bool cond = true;
 
-  if (isPbPb) {
+  if (isPbp) {
     cond = cond && (cutA.Centrality.Start    == cutB.Centrality.Start);
     cond = cond && (cutA.Centrality.End      == cutB.Centrality.End);
   }
@@ -213,7 +213,7 @@ typedef struct CharmModel {
 } CharmModel;
 
 typedef struct OniaModel {
-  CharmModel  PbPb, PP;
+  CharmModel  Pbp, PP;
 } OniaModel;
 
 
